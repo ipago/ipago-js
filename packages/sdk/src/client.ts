@@ -38,6 +38,16 @@ export class TwoPay {
     this.fetchImpl = opts.fetchImpl ?? fetch;
   }
 
+  private qs(query?: Record<string, string | number | boolean | undefined> | undefined): string {
+    if (!query) return "";
+    const params = new URLSearchParams();
+    for (const [k, v] of Object.entries(query)) {
+      if (v !== undefined) params.set(k, String(v));
+    }
+    const s = params.toString();
+    return s ? `?${s}` : "";
+  }
+
   private async get<T>(path: string): Promise<T> {
     const res = await this.fetchImpl(`${this.baseUrl}${path}`, {
       headers: { authorization: `Bearer ${this.apiKey}` },
@@ -78,70 +88,30 @@ export class TwoPay {
   }
 
   readonly products = {
-    list: (query?: { limit?: number; starting_after?: string; active?: "true" | "false"; category?: string }): Promise<ProductList> => {
-      const params = new URLSearchParams();
-      if (query) {
-        for (const [k, v] of Object.entries(query)) {
-          if (v !== undefined) params.set(k, String(v));
-        }
-      }
-      const qs = params.toString();
-      return this.get<ProductList>(`/v1/products${qs ? `?${qs}` : ""}`);
-    },
+    list: (query?: operations["listProducts"]["parameters"]["query"]): Promise<ProductList> =>
+      this.get<ProductList>(`/v1/products${this.qs(query as Record<string, string | number | boolean | undefined>)}`),
     retrieve: (id: string): Promise<Product> => this.get<Product>(`/v1/products/${id}`),
   };
 
   readonly categories = {
-    list: (query?: ListCategoriesQuery): Promise<CategoryList> => {
-      const params = new URLSearchParams();
-      if (query) {
-        for (const [k, v] of Object.entries(query)) {
-          if (v !== undefined) params.set(k, String(v));
-        }
-      }
-      const qs = params.toString();
-      return this.get<CategoryList>(`/v1/categories${qs ? `?${qs}` : ""}`);
-    },
-    retrieve: (id: string, opts?: GetCategoryQuery): Promise<Category> => {
-      const params = new URLSearchParams();
-      if (opts) {
-        for (const [k, v] of Object.entries(opts)) {
-          if (v !== undefined) params.set(k, String(v));
-        }
-      }
-      const qs = params.toString();
-      return this.get<Category>(`/v1/categories/${id}${qs ? `?${qs}` : ""}`);
-    },
+    list: (query?: ListCategoriesQuery): Promise<CategoryList> =>
+      this.get<CategoryList>(`/v1/categories${this.qs(query as Record<string, string | number | boolean | undefined>)}`),
+    retrieve: (id: string, opts?: GetCategoryQuery): Promise<Category> =>
+      this.get<Category>(`/v1/categories/${id}${this.qs(opts as Record<string, string | number | boolean | undefined>)}`),
   };
 
   readonly webhookEndpoints = {
     create: (body: CreateWebhookBody): Promise<WebhookEndpointCreated> =>
       this.post<WebhookEndpointCreated>("/v1/webhook_endpoints", body),
-    list: (query?: ListWebhookEndpointsQuery): Promise<WebhookEndpointList> => {
-      const params = new URLSearchParams();
-      if (query) {
-        for (const [k, v] of Object.entries(query)) {
-          if (v !== undefined) params.set(k, String(v));
-        }
-      }
-      const qs = params.toString();
-      return this.get<WebhookEndpointList>(`/v1/webhook_endpoints${qs ? `?${qs}` : ""}`);
-    },
+    list: (query?: ListWebhookEndpointsQuery): Promise<WebhookEndpointList> =>
+      this.get<WebhookEndpointList>(`/v1/webhook_endpoints${this.qs(query as Record<string, string | number | boolean | undefined>)}`),
     retrieve: (id: string): Promise<WebhookEndpoint> => this.get<WebhookEndpoint>(`/v1/webhook_endpoints/${id}`),
     del: (id: string): Promise<WebhookEndpointDeleted> => this.del<WebhookEndpointDeleted>(`/v1/webhook_endpoints/${id}`),
   };
 
   readonly events = {
-    list: (query?: ListEventsQuery): Promise<EventList> => {
-      const params = new URLSearchParams();
-      if (query) {
-        for (const [k, v] of Object.entries(query)) {
-          if (v !== undefined) params.set(k, String(v));
-        }
-      }
-      const qs = params.toString();
-      return this.get<EventList>(`/v1/events${qs ? `?${qs}` : ""}`);
-    },
+    list: (query?: ListEventsQuery): Promise<EventList> =>
+      this.get<EventList>(`/v1/events${this.qs(query as Record<string, string | number | boolean | undefined>)}`),
     retrieve: (id: string): Promise<Event> => this.get<Event>(`/v1/events/${id}`),
     sendTest: (endpointId: string): Promise<TestEventResult> =>
       this.post<TestEventResult>(`/v1/webhook_endpoints/${endpointId}/test`),
