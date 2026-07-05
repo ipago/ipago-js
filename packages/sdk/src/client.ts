@@ -14,6 +14,8 @@ type TestEventResult = operations["sendTestEvent"]["responses"]["202"]["content"
 type Checkout = operations["createCheckout"]["responses"]["201"]["content"]["application/json"];
 type OrderList = operations["listOrders"]["responses"]["200"]["content"]["application/json"];
 type Order = operations["getOrder"]["responses"]["200"]["content"]["application/json"];
+type Balance = operations["getBalance"]["responses"]["200"]["content"]["application/json"];
+type LedgerEntryList = operations["listLedgerEntries"]["responses"]["200"]["content"]["application/json"];
 
 type CreateWebhookBody = operations["createWebhookEndpoint"]["requestBody"]["content"]["application/json"];
 type ListCategoriesQuery = operations["listCategories"]["parameters"]["query"];
@@ -22,6 +24,7 @@ type ListWebhookEndpointsQuery = operations["listWebhookEndpoints"]["parameters"
 type ListEventsQuery = operations["listEvents"]["parameters"]["query"];
 type CreateCheckoutBody = operations["createCheckout"]["requestBody"]["content"]["application/json"];
 type ListOrdersQuery = operations["listOrders"]["parameters"]["query"];
+type ListLedgerEntriesQuery = operations["listLedgerEntries"]["parameters"]["query"];
 
 export class TwoPayError extends Error {
   constructor(readonly status: number, readonly body: unknown) {
@@ -131,5 +134,14 @@ export class TwoPay {
     list: (query?: ListOrdersQuery): Promise<OrderList> =>
       this.get<OrderList>(`/v1/orders${this.qs(query as Record<string, string | number | boolean | undefined>)}`),
     retrieve: (id: string): Promise<Order> => this.get<Order>(`/v1/orders/${id}`),
+  };
+
+  readonly balance = {
+    retrieve: (): Promise<Balance> => this.get<Balance>("/v1/balance"),
+  };
+
+  readonly ledgerEntries = {
+    list: (query?: ListLedgerEntriesQuery): Promise<LedgerEntryList> =>
+      this.get<LedgerEntryList>(`/v1/ledger_entries${this.qs(query as Record<string, string | number | boolean | undefined>)}`),
   };
 }
