@@ -11,12 +11,17 @@ type WebhookEndpointDeleted = operations["deleteWebhookEndpoint"]["responses"]["
 type EventList = operations["listEvents"]["responses"]["200"]["content"]["application/json"];
 type Event = operations["getEvent"]["responses"]["200"]["content"]["application/json"];
 type TestEventResult = operations["sendTestEvent"]["responses"]["202"]["content"]["application/json"];
+type Checkout = operations["createCheckout"]["responses"]["201"]["content"]["application/json"];
+type OrderList = operations["listOrders"]["responses"]["200"]["content"]["application/json"];
+type Order = operations["getOrder"]["responses"]["200"]["content"]["application/json"];
 
 type CreateWebhookBody = operations["createWebhookEndpoint"]["requestBody"]["content"]["application/json"];
 type ListCategoriesQuery = operations["listCategories"]["parameters"]["query"];
 type GetCategoryQuery = operations["getCategory"]["parameters"]["query"];
 type ListWebhookEndpointsQuery = operations["listWebhookEndpoints"]["parameters"]["query"];
 type ListEventsQuery = operations["listEvents"]["parameters"]["query"];
+type CreateCheckoutBody = operations["createCheckout"]["requestBody"]["content"]["application/json"];
+type ListOrdersQuery = operations["listOrders"]["parameters"]["query"];
 
 export class TwoPayError extends Error {
   constructor(readonly status: number, readonly body: unknown) {
@@ -115,5 +120,16 @@ export class TwoPay {
     retrieve: (id: string): Promise<Event> => this.get<Event>(`/v1/events/${id}`),
     sendTest: (endpointId: string): Promise<TestEventResult> =>
       this.post<TestEventResult>(`/v1/webhook_endpoints/${endpointId}/test`),
+  };
+
+  readonly checkouts = {
+    create: (body: CreateCheckoutBody): Promise<Checkout> =>
+      this.post<Checkout>("/v1/checkouts", body),
+  };
+
+  readonly orders = {
+    list: (query?: ListOrdersQuery): Promise<OrderList> =>
+      this.get<OrderList>(`/v1/orders${this.qs(query as Record<string, string | number | boolean | undefined>)}`),
+    retrieve: (id: string): Promise<Order> => this.get<Order>(`/v1/orders/${id}`),
   };
 }
