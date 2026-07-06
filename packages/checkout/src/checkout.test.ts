@@ -100,6 +100,86 @@ describe("mount", () => {
     ).toThrow("2Pay Checkout: element not found: #nope");
   });
 
+  it("calls onError and does not call mountPayment when createSession returns no clientSecret", async () => {
+    const createSession = vi.fn(async () => ({} as { clientSecret: string }));
+    const onError = vi.fn();
+    mount({
+      element: "#app",
+      fields: [
+        { key: "player_name", label: "User", type: "text", required: true },
+        { key: "email", label: "Email", type: "email", required: true },
+      ],
+      createSession,
+      publishableKey: "pk_test",
+      onError,
+    });
+
+    const app = document.getElementById("app")!;
+    (app.querySelector("input[name='player_name']") as HTMLInputElement).value = "Alice";
+    (app.querySelector("input[name='email']") as HTMLInputElement).value = "alice@example.com";
+
+    app.querySelector("form")!.dispatchEvent(new Event("submit", { bubbles: true, cancelable: true }));
+
+    await vi.waitFor(() => expect(onError).toHaveBeenCalled());
+
+    expect(onError).toHaveBeenCalledWith(expect.any(Error));
+    expect(mockedMountPayment).not.toHaveBeenCalled();
+    expect(app.querySelector("form.twopay-form")).toBeTruthy();
+  });
+
+  it("keeps the form in the DOM when mountPayment rejects", async () => {
+    mockedMountPayment.mockRejectedValueOnce(new Error("stripe load failed"));
+    const createSession = vi.fn(async () => ({ clientSecret: "cs_test_1" }));
+    const onError = vi.fn();
+    mount({
+      element: "#app",
+      fields: [
+        { key: "player_name", label: "User", type: "text", required: true },
+        { key: "email", label: "Email", type: "email", required: true },
+      ],
+      createSession,
+      publishableKey: "pk_test",
+      onError,
+    });
+
+    const app = document.getElementById("app")!;
+    (app.querySelector("input[name='player_name']") as HTMLInputElement).value = "Dave";
+    (app.querySelector("input[name='email']") as HTMLInputElement).value = "dave@example.com";
+
+    app.querySelector("form")!.dispatchEvent(new Event("submit", { bubbles: true, cancelable: true }));
+
+    await vi.waitFor(() => expect(onError).toHaveBeenCalled());
+
+    expect(onError).toHaveBeenCalledWith(expect.any(Error));
+    expect(app.querySelector("form.twopay-form")).toBeTruthy();
+    expect(app.querySelector("input[name='player_name']")).toBeTruthy();
+  });
+
+  it("logs to console.error when onError is not provided and createSession rejects", async () => {
+    const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    const createSession = vi.fn(async () => { throw new Error("session error"); });
+    mount({
+      element: "#app",
+      fields: [
+        { key: "player_name", label: "User", type: "text", required: true },
+        { key: "email", label: "Email", type: "email", required: true },
+      ],
+      createSession,
+      publishableKey: "pk_test",
+    });
+
+    const app = document.getElementById("app")!;
+    (app.querySelector("input[name='player_name']") as HTMLInputElement).value = "Eve";
+    (app.querySelector("input[name='email']") as HTMLInputElement).value = "eve@example.com";
+
+    app.querySelector("form")!.dispatchEvent(new Event("submit", { bubbles: true, cancelable: true }));
+
+    await vi.waitFor(() => expect(consoleSpy).toHaveBeenCalled());
+
+    expect(consoleSpy).toHaveBeenCalledWith("[2Pay Checkout] Unhandled error:", expect.any(Error));
+    consoleSpy.mockRestore();
+  });
+
   it("unmount tears down the form and payment", async () => {
     const createSession = vi.fn(async () => ({ clientSecret: "cs_test_1" }));
     const { unmount } = mount({

@@ -29,15 +29,18 @@ export function mount(options: MountOptions): { unmount: () => void } {
       if (!session || !session.clientSecret) {
         throw new Error("createSession did not return a clientSecret");
       }
-      form?.destroy();
-      form = undefined;
-      payment = await mountPayment({
+      const newPayment = await mountPayment({
         publishableKey: options.publishableKey,
         clientSecret: session.clientSecret,
         element: el,
       });
+      form?.destroy();
+      form = undefined;
+      payment = newPayment;
     } catch (err) {
-      options.onError?.(err instanceof Error ? err : new Error(String(err)));
+      const error = err instanceof Error ? err : new Error(String(err));
+      if (options.onError) options.onError(error);
+      else console.error("[2Pay Checkout] Unhandled error:", error);
     }
   });
 
