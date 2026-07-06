@@ -18,6 +18,8 @@ type Balance = operations["getBalance"]["responses"]["200"]["content"]["applicat
 type LedgerEntryList = operations["listLedgerEntries"]["responses"]["200"]["content"]["application/json"];
 type PayoutList = operations["listPayouts"]["responses"]["200"]["content"]["application/json"];
 type Payout = operations["createPayout"]["responses"]["201"]["content"]["application/json"];
+type Refund = operations["createRefund"]["responses"]["201"]["content"]["application/json"];
+type RefundList = operations["listRefunds"]["responses"]["200"]["content"]["application/json"];
 
 type CreateWebhookBody = operations["createWebhookEndpoint"]["requestBody"]["content"]["application/json"];
 type ListCategoriesQuery = operations["listCategories"]["parameters"]["query"];
@@ -29,6 +31,8 @@ type ListOrdersQuery = operations["listOrders"]["parameters"]["query"];
 type ListLedgerEntriesQuery = operations["listLedgerEntries"]["parameters"]["query"];
 type ListPayoutsQuery = operations["listPayouts"]["parameters"]["query"];
 type CreatePayoutBody = operations["createPayout"]["requestBody"]["content"]["application/json"];
+type CreateRefundBody = operations["createRefund"]["requestBody"]["content"]["application/json"];
+type ListRefundsQuery = operations["listRefunds"]["parameters"]["query"];
 
 export class TwoPayError extends Error {
   constructor(readonly status: number, readonly body: unknown) {
@@ -156,5 +160,14 @@ export class TwoPay {
       this.get<PayoutList>(`/v1/payouts${this.qs(query as Record<string, string | number | boolean | undefined>)}`),
     retrieve: (id: string): Promise<Payout> =>
       this.get<Payout>(`/v1/payouts/${id}`),
+  };
+
+  readonly refunds = {
+    create: (body: CreateRefundBody): Promise<Refund> =>
+      this.post<Refund>("/v1/refunds", body),
+    list: (query?: ListRefundsQuery): Promise<RefundList> =>
+      this.get<RefundList>(`/v1/refunds${this.qs(query as Record<string, string | number | boolean | undefined>)}`),
+    retrieve: (id: string): Promise<Refund> =>
+      this.get<Refund>(`/v1/refunds/${id}`),
   };
 }
