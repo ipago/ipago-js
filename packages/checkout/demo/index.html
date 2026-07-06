@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@2pay/checkout — local demo</title>
+  </head>
+  <body>
+    <h1>@2pay/checkout demo</h1>
+    <p>
+      This file is a documentation artifact showing the hosted-script integration.
+      It loads the locally built IIFE bundle so you can inspect it without a CDN.
+    </p>
+
+    <div id="checkout"></div>
+
+    <script src="../dist/checkout.global.js"></script>
+    <script>
+      TwoPayCheckout.mount({
+        element: "#checkout",
+        fields: [
+          { key: "player_name", label: "Minecraft username", type: "text", required: true },
+          { key: "email", label: "Email", type: "email", required: true }
+        ],
+        publishableKey: "pk_test_your_2pay_publishable_key",
+        createSession: async (values) => {
+          const res = await fetch("/create-checkout", {
+            method: "POST",
+            headers: { "content-type": "application/json" },
+            body: JSON.stringify(values)
+          });
+          return await res.json(); // { clientSecret }
+        },
+        onError: (err) => console.error("checkout error", err)
+      });
+    </script>
+  </body>
+</html>
