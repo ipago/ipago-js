@@ -20,6 +20,8 @@ type PayoutList = operations["listPayouts"]["responses"]["200"]["content"]["appl
 type Payout = operations["createPayout"]["responses"]["201"]["content"]["application/json"];
 type Refund = operations["createRefund"]["responses"]["201"]["content"]["application/json"];
 type RefundList = operations["listRefunds"]["responses"]["200"]["content"]["application/json"];
+type DeliveryList = operations["listDeliveries"]["responses"]["200"]["content"]["application/json"];
+type Delivery = operations["getDelivery"]["responses"]["200"]["content"]["application/json"];
 
 type CreateWebhookBody = operations["createWebhookEndpoint"]["requestBody"]["content"]["application/json"];
 type ListCategoriesQuery = operations["listCategories"]["parameters"]["query"];
@@ -33,6 +35,9 @@ type ListPayoutsQuery = operations["listPayouts"]["parameters"]["query"];
 type CreatePayoutBody = operations["createPayout"]["requestBody"]["content"]["application/json"];
 type CreateRefundBody = operations["createRefund"]["requestBody"]["content"]["application/json"];
 type ListRefundsQuery = operations["listRefunds"]["parameters"]["query"];
+type ListDeliveriesQuery = operations["listDeliveries"]["parameters"]["query"];
+type CompleteDeliveryBody = operations["completeDelivery"]["requestBody"]["content"]["application/json"];
+type FailDeliveryBody = operations["failDelivery"]["requestBody"]["content"]["application/json"];
 
 export class TwoPayError extends Error {
   constructor(readonly status: number, readonly body: unknown) {
@@ -169,5 +174,16 @@ export class TwoPay {
       this.get<RefundList>(`/v1/refunds${this.qs(query as Record<string, string | number | boolean | undefined>)}`),
     retrieve: (id: string): Promise<Refund> =>
       this.get<Refund>(`/v1/refunds/${id}`),
+  };
+
+  readonly deliveries = {
+    list: (query?: ListDeliveriesQuery): Promise<DeliveryList> =>
+      this.get<DeliveryList>(`/v1/deliveries${this.qs(query as Record<string, string | number | boolean | undefined>)}`),
+    retrieve: (id: string): Promise<Delivery> =>
+      this.get<Delivery>(`/v1/deliveries/${id}`),
+    complete: (id: string, body?: CompleteDeliveryBody): Promise<Delivery> =>
+      this.post<Delivery>(`/v1/deliveries/${id}/complete`, body),
+    fail: (id: string, body?: FailDeliveryBody): Promise<Delivery> =>
+      this.post<Delivery>(`/v1/deliveries/${id}/fail`, body),
   };
 }

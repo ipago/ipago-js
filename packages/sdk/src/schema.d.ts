@@ -391,6 +391,70 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/deliveries": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["listDeliveries"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/deliveries/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getDelivery"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/deliveries/{id}/complete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["completeDelivery"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/deliveries/{id}/fail": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["failDelivery"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -1362,6 +1426,7 @@ export interface operations {
                     }[];
                     customer_email?: string;
                     return_url?: string;
+                    delivery_target?: string;
                 };
             };
         };
@@ -1520,6 +1585,7 @@ export interface operations {
                                 amount: number;
                                 currency: string;
                             };
+                            delivery_target: string | null;
                             payment_method: string | null;
                             created: string;
                             paid_at: string | null;
@@ -1606,6 +1672,7 @@ export interface operations {
                             amount: number;
                             currency: string;
                         };
+                        delivery_target: string | null;
                         payment_method: string | null;
                         created: string;
                         paid_at: string | null;
@@ -2327,6 +2394,357 @@ export interface operations {
                         currency: string;
                         status: string;
                         reason: string | null;
+                        created: string;
+                        completed_at: string | null;
+                    };
+                };
+            };
+            /** @description Default Response */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+            /** @description Default Response */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+            /** @description Default Response */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    listDeliveries: {
+        parameters: {
+            query?: {
+                limit?: number;
+                starting_after?: string;
+                ending_before?: string;
+                status?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @enum {string} */
+                        object: "list";
+                        data: {
+                            /** @enum {string} */
+                            object: "delivery";
+                            id: string;
+                            order: string;
+                            order_item: string;
+                            product: string;
+                            recipient: string | null;
+                            quantity: number;
+                            config: unknown;
+                            status: string;
+                            note: string | null;
+                            created: string;
+                            completed_at: string | null;
+                        }[];
+                        has_more: boolean;
+                    };
+                };
+            };
+            /** @description Default Response */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+            /** @description Default Response */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    getDelivery: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @enum {string} */
+                        object: "delivery";
+                        id: string;
+                        order: string;
+                        order_item: string;
+                        product: string;
+                        recipient: string | null;
+                        quantity: number;
+                        config: unknown;
+                        status: string;
+                        note: string | null;
+                        created: string;
+                        completed_at: string | null;
+                    };
+                };
+            };
+            /** @description Default Response */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+            /** @description Default Response */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+            /** @description Default Response */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    completeDelivery: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    note?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @enum {string} */
+                        object: "delivery";
+                        id: string;
+                        order: string;
+                        order_item: string;
+                        product: string;
+                        recipient: string | null;
+                        quantity: number;
+                        config: unknown;
+                        status: string;
+                        note: string | null;
+                        created: string;
+                        completed_at: string | null;
+                    };
+                };
+            };
+            /** @description Default Response */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+            /** @description Default Response */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+            /** @description Default Response */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    failDelivery: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    note?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @enum {string} */
+                        object: "delivery";
+                        id: string;
+                        order: string;
+                        order_item: string;
+                        product: string;
+                        recipient: string | null;
+                        quantity: number;
+                        config: unknown;
+                        status: string;
+                        note: string | null;
                         created: string;
                         completed_at: string | null;
                     };
