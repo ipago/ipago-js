@@ -22,6 +22,8 @@ type Refund = operations["createRefund"]["responses"]["201"]["content"]["applica
 type RefundList = operations["listRefunds"]["responses"]["200"]["content"]["application/json"];
 type DeliveryList = operations["listDeliveries"]["responses"]["200"]["content"]["application/json"];
 type Delivery = operations["getDelivery"]["responses"]["200"]["content"]["application/json"];
+type DisputeList = operations["listDisputes"]["responses"]["200"]["content"]["application/json"];
+type Dispute = operations["getDispute"]["responses"]["200"]["content"]["application/json"];
 
 type CreateWebhookBody = operations["createWebhookEndpoint"]["requestBody"]["content"]["application/json"];
 type ListCategoriesQuery = operations["listCategories"]["parameters"]["query"];
@@ -38,6 +40,7 @@ type ListRefundsQuery = operations["listRefunds"]["parameters"]["query"];
 type ListDeliveriesQuery = operations["listDeliveries"]["parameters"]["query"];
 type CompleteDeliveryBody = operations["completeDelivery"]["requestBody"]["content"]["application/json"];
 type FailDeliveryBody = operations["failDelivery"]["requestBody"]["content"]["application/json"];
+type ListDisputesQuery = operations["listDisputes"]["parameters"]["query"];
 
 export class TwoPayError extends Error {
   constructor(readonly status: number, readonly body: unknown) {
@@ -185,5 +188,12 @@ export class TwoPay {
       this.post<Delivery>(`/v1/deliveries/${id}/complete`, body),
     fail: (id: string, body?: FailDeliveryBody): Promise<Delivery> =>
       this.post<Delivery>(`/v1/deliveries/${id}/fail`, body),
+  };
+
+  readonly disputes = {
+    list: (query?: ListDisputesQuery): Promise<DisputeList> =>
+      this.get<DisputeList>(`/v1/disputes${this.qs(query as Record<string, string | number | boolean | undefined>)}`),
+    retrieve: (id: string): Promise<Dispute> =>
+      this.get<Dispute>(`/v1/disputes/${id}`),
   };
 }
