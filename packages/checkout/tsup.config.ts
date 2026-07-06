@@ -7,6 +7,7 @@ export default defineConfig([
     format: ["iife"],
     globalName: "TwoPayCheckout",
     clean: false,
+    // dist/checkout.global.js is deployed to the CDN as https://js.2pay.io/v1/checkout.js (the deploy step renames it)
     outExtension: () => ({ js: ".global.js" }),
   },
 ]);

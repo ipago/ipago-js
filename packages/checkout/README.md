@@ -75,6 +75,18 @@ TwoPayCheckout.mount({
 
 ---
 
+## Content Security Policy
+
+If your page sets a `Content-Security-Policy` header, you must allow Stripe origins or the embedded checkout iframe will be silently blocked. Add the following directives:
+
+```
+frame-src https://*.stripe.com;
+connect-src https://api.stripe.com https://*.stripe.com;
+script-src https://js.stripe.com;
+```
+
+---
+
 ## Security model
 
 Session creation always happens on the merchant's server, never in the browser:

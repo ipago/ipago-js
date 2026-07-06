@@ -78,7 +78,7 @@ describe("renderForm", () => {
 
     // error nodes should appear for the two required-but-empty fields
     const errors = container.querySelectorAll(".twopay-error");
-    expect(errors.length).toBeGreaterThanOrEqual(1);
+    expect(errors.length).toBe(2);
   });
 
   it("calls onSubmit exactly once with collected values when all required fields are filled", () => {
