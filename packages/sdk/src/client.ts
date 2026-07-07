@@ -24,6 +24,12 @@ type DeliveryList = operations["listDeliveries"]["responses"]["200"]["content"][
 type Delivery = operations["getDelivery"]["responses"]["200"]["content"]["application/json"];
 type DisputeList = operations["listDisputes"]["responses"]["200"]["content"]["application/json"];
 type Dispute = operations["getDispute"]["responses"]["200"]["content"]["application/json"];
+type RegisterBody = operations["register"]["requestBody"]["content"]["application/json"];
+type RegisterResult = operations["register"]["responses"]["201"]["content"]["application/json"];
+type LoginBody = operations["login"]["requestBody"]["content"]["application/json"];
+type LoginResult = operations["login"]["responses"]["200"]["content"]["application/json"];
+type LogoutResult = operations["logout"]["responses"]["200"]["content"]["application/json"];
+type MeResult = operations["getMe"]["responses"]["200"]["content"]["application/json"];
 
 type CreateWebhookBody = operations["createWebhookEndpoint"]["requestBody"]["content"]["application/json"];
 type ListCategoriesQuery = operations["listCategories"]["parameters"]["query"];
@@ -107,6 +113,26 @@ export class TwoPay {
     if (!res.ok) {
       const body = await res.json().catch(() => ({}));
       throw new TwoPayError(res.status, body);
+    }
+    return (await res.json()) as T;
+  }
+
+  private async request<T>(
+    method: "GET" | "POST" | "DELETE",
+    path: string,
+    options?: { body?: unknown; authToken?: string },
+  ): Promise<T> {
+    const bearer = options?.authToken != null ? `Bearer ${options.authToken}` : `Bearer ${this.apiKey}`;
+    const headers: Record<string, string> = { authorization: bearer };
+    if (options?.body !== undefined) headers["content-type"] = "application/json";
+    const res = await this.fetchImpl(`${this.baseUrl}${path}`, {
+      method,
+      headers,
+      body: options?.body !== undefined ? JSON.stringify(options.body) : undefined,
+    });
+    if (!res.ok) {
+      const errBody = await res.json().catch(() => ({}));
+      throw new TwoPayError(res.status, errBody);
     }
     return (await res.json()) as T;
   }
@@ -195,5 +221,16 @@ export class TwoPay {
       this.get<DisputeList>(`/v1/disputes${this.qs(query as Record<string, string | number | boolean | undefined>)}`),
     retrieve: (id: string): Promise<Dispute> =>
       this.get<Dispute>(`/v1/disputes/${id}`),
+  };
+
+  readonly auth = {
+    register: (body: RegisterBody): Promise<RegisterResult> =>
+      this.request<RegisterResult>("POST", "/v1/auth/register", { body }),
+    login: (body: LoginBody): Promise<LoginResult> =>
+      this.request<LoginResult>("POST", "/v1/auth/login", { body }),
+    logout: (token: string): Promise<LogoutResult> =>
+      this.request<LogoutResult>("POST", "/v1/auth/logout", { authToken: token }),
+    me: (token: string): Promise<MeResult> =>
+      this.request<MeResult>("GET", "/v1/me", { authToken: token }),
   };
 }
