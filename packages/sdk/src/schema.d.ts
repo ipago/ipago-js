@@ -903,6 +903,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/storefront/{slug}/baskets/{basketId}/checkout": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["checkoutBasket"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -6339,6 +6355,113 @@ export interface operations {
             };
             /** @description Default Response */
             404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    checkoutBasket: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                slug: string;
+                basketId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    customer_email?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Default Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @enum {string} */
+                        object: "checkout";
+                        id: string;
+                        client_secret: string;
+                        status: string;
+                        total: {
+                            amount: number;
+                            currency: string;
+                        };
+                    };
+                };
+            };
+            /** @description Default Response */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+            /** @description Default Response */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+            /** @description Default Response */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+            /** @description Default Response */
+            500: {
                 headers: {
                     [name: string]: unknown;
                 };
