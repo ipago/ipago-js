@@ -57,6 +57,17 @@ export class TwoPayError extends Error {
 
 export type TwoPayOptions = { baseUrl: string; apiKey: string; fetchImpl?: typeof fetch };
 
+export type RequestOptions = {
+  /**
+   * Value for the `Idempotency-Key` header.
+   *
+   * Retrying a request that creates money movement is otherwise how one checkout becomes two
+   * charges. Generate the key once per intent (not per attempt: reusing it across retries is
+   * the entire point) and the API replays the original response instead of acting again.
+   */
+  idempotencyKey?: string;
+};
+
 export class TwoPay {
   private readonly baseUrl: string;
   private readonly apiKey: string;
@@ -89,13 +100,15 @@ export class TwoPay {
     return (await res.json()) as T;
   }
 
-  private async post<T>(path: string, body?: unknown): Promise<T> {
+  private async post<T>(path: string, body?: unknown, opts?: RequestOptions): Promise<T> {
+    const headers: Record<string, string> = {
+      authorization: `Bearer ${this.apiKey}`,
+      "content-type": "application/json",
+    };
+    if (opts?.idempotencyKey) headers["idempotency-key"] = opts.idempotencyKey;
     const res = await this.fetchImpl(`${this.baseUrl}${path}`, {
       method: "POST",
-      headers: {
-        authorization: `Bearer ${this.apiKey}`,
-        "content-type": "application/json",
-      },
+      headers,
       body: body !== undefined ? JSON.stringify(body) : undefined,
     });
     if (!res.ok) {
@@ -168,8 +181,8 @@ export class TwoPay {
   };
 
   readonly checkouts = {
-    create: (body: CreateCheckoutBody): Promise<Checkout> =>
-      this.post<Checkout>("/v1/checkouts", body),
+    create: (body: CreateCheckoutBody, opts?: RequestOptions): Promise<Checkout> =>
+      this.post<Checkout>("/v1/checkouts", body, opts),
   };
 
   readonly orders = {
@@ -188,8 +201,8 @@ export class TwoPay {
   };
 
   readonly payouts = {
-    create: (body: CreatePayoutBody): Promise<Payout> =>
-      this.post<Payout>("/v1/payouts", body),
+    create: (body: CreatePayoutBody, opts?: RequestOptions): Promise<Payout> =>
+      this.post<Payout>("/v1/payouts", body, opts),
     list: (query?: ListPayoutsQuery): Promise<PayoutList> =>
       this.get<PayoutList>(`/v1/payouts${this.qs(query as Record<string, string | number | boolean | undefined>)}`),
     retrieve: (id: string): Promise<Payout> =>
@@ -197,8 +210,8 @@ export class TwoPay {
   };
 
   readonly refunds = {
-    create: (body: CreateRefundBody): Promise<Refund> =>
-      this.post<Refund>("/v1/refunds", body),
+    create: (body: CreateRefundBody, opts?: RequestOptions): Promise<Refund> =>
+      this.post<Refund>("/v1/refunds", body, opts),
     list: (query?: ListRefundsQuery): Promise<RefundList> =>
       this.get<RefundList>(`/v1/refunds${this.qs(query as Record<string, string | number | boolean | undefined>)}`),
     retrieve: (id: string): Promise<Refund> =>
