@@ -9,7 +9,7 @@ A lightweight browser library that renders a merchant-configured pre-checkout fo
 Add the script tag to your page. On production, load it from the 2Pay CDN:
 
 ```html
-<script src="https://js.2pay.io/v1/checkout.js"></script>
+<script src="https://js.2pay.gg/v1/checkout.js"></script>
 ```
 
 Then call `TwoPayCheckout.mount`:
@@ -17,7 +17,7 @@ Then call `TwoPayCheckout.mount`:
 ```html
 <div id="checkout"></div>
 
-<script src="https://js.2pay.io/v1/checkout.js"></script>
+<script src="https://js.2pay.gg/v1/checkout.js"></script>
 <script>
   TwoPayCheckout.mount({
     element: "#checkout",
