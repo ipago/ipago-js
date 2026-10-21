@@ -9372,6 +9372,23 @@ export interface operations {
                 };
             };
             /** @description Default Response */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+            /** @description Default Response */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -9456,6 +9473,23 @@ export interface operations {
             };
             /** @description Default Response */
             401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+            /** @description Default Response */
+            403: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -10813,6 +10847,7 @@ export interface operations {
                             role: "admin" | "superadmin";
                             created: string;
                             deactivated_at: string | null;
+                            two_factor: boolean;
                         }[];
                         has_more: boolean;
                     };
@@ -10890,6 +10925,7 @@ export interface operations {
                         role: "admin" | "superadmin";
                         created: string;
                         deactivated_at: string | null;
+                        two_factor: boolean;
                     };
                 };
             };
