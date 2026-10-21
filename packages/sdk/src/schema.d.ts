@@ -701,6 +701,38 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/auth/email-verification/confirm": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["confirmEmailVerification"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/auth/email-verification/resend": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["resendEmailVerification"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/admin/auth/login": {
         parameters: {
             query?: never;
@@ -5550,6 +5582,7 @@ export interface operations {
                             id: string;
                             email: string;
                             name: string | null;
+                            email_verified: boolean;
                             created: string;
                         };
                     };
@@ -5624,6 +5657,7 @@ export interface operations {
                             id: string;
                             email: string;
                             name: string | null;
+                            email_verified: boolean;
                             created: string;
                         };
                     };
@@ -5728,6 +5762,7 @@ export interface operations {
                         id: string;
                         email: string;
                         name: string | null;
+                        email_verified: boolean;
                         created: string;
                         accounts: {
                             id: string;
@@ -5822,6 +5857,93 @@ export interface operations {
             };
             /** @description Default Response */
             400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    confirmEmailVerification: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    token: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @enum {boolean} */
+                        ok: true;
+                    };
+                };
+            };
+            /** @description Default Response */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    resendEmailVerification: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @enum {boolean} */
+                        ok: true;
+                        already_verified: boolean;
+                    };
+                };
+            };
+            /** @description Default Response */
+            401: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -10009,6 +10131,11 @@ export interface operations {
                             refunded_at?: string | null;
                             created: string;
                             paid_at: string | null;
+                            /** @description Cumulative GROSS amount refunded to the buyer (net plus VAT). Refundable remainder = total + tax_amount - amount_refunded. */
+                            amount_refunded: {
+                                amount: number;
+                                currency: string;
+                            };
                         }[];
                         has_more: boolean;
                     };
@@ -10377,6 +10504,8 @@ export interface operations {
                 "application/json": {
                     order: string;
                     reason?: string;
+                    /** @description GROSS amount to refund, in minor units of the order currency (what the buyer paid, VAT included). Omit to refund the whole order. Must not exceed the order's total plus tax minus what was already refunded. */
+                    amount?: number;
                 };
             };
         };
