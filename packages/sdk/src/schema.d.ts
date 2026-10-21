@@ -1549,6 +1549,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/admin/disputes/{disputeId}/evidence": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["submitAdminDisputeEvidence"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/stores/{storeId}/api-keys": {
         parameters: {
             query?: never;
@@ -5364,6 +5380,9 @@ export interface operations {
                             status: string;
                             evidence_due_by: string | null;
                             evidence_submitted_at: string | null;
+                            evidence_text: string | null;
+                            /** @enum {string|null} */
+                            evidence_submitted_by: "merchant" | "admin" | null;
                             created: string;
                             closed_at: string | null;
                         }[];
@@ -5435,6 +5454,9 @@ export interface operations {
                         status: string;
                         evidence_due_by: string | null;
                         evidence_submitted_at: string | null;
+                        evidence_text: string | null;
+                        /** @enum {string|null} */
+                        evidence_submitted_by: "merchant" | "admin" | null;
                         created: string;
                         closed_at: string | null;
                     };
@@ -10262,6 +10284,9 @@ export interface operations {
                             status: string;
                             evidence_due_by: string | null;
                             evidence_submitted_at: string | null;
+                            evidence_text: string | null;
+                            /** @enum {string|null} */
+                            evidence_submitted_by: "merchant" | "admin" | null;
                             created: string;
                             closed_at: string | null;
                         }[];
@@ -11132,6 +11157,9 @@ export interface operations {
                             status: string;
                             evidence_due_by: string | null;
                             evidence_submitted_at: string | null;
+                            evidence_text: string | null;
+                            /** @enum {string|null} */
+                            evidence_submitted_by: "merchant" | "admin" | null;
                             created: string;
                             closed_at: string | null;
                         }[];
@@ -11206,6 +11234,9 @@ export interface operations {
                         status: string;
                         evidence_due_by: string | null;
                         evidence_submitted_at: string | null;
+                        evidence_text: string | null;
+                        /** @enum {string|null} */
+                        evidence_submitted_by: "merchant" | "admin" | null;
                         created: string;
                         closed_at: string | null;
                     };
@@ -11282,6 +11313,155 @@ export interface operations {
                         status: string;
                         evidence_due_by: string | null;
                         evidence_submitted_at: string | null;
+                        evidence_text: string | null;
+                        /** @enum {string|null} */
+                        evidence_submitted_by: "merchant" | "admin" | null;
+                        created: string;
+                        closed_at: string | null;
+                    };
+                };
+            };
+            /** @description Default Response */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+            /** @description Default Response */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+            /** @description Default Response */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+            /** @description Default Response */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+            /** @description Default Response */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+            /** @description Default Response */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    submitAdminDisputeEvidence: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                disputeId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    evidence_text: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @enum {string} */
+                        object: "dispute";
+                        id: string;
+                        order: string;
+                        amount: number;
+                        currency: string;
+                        reason: string | null;
+                        status: string;
+                        evidence_due_by: string | null;
+                        evidence_submitted_at: string | null;
+                        evidence_text: string | null;
+                        /** @enum {string|null} */
+                        evidence_submitted_by: "merchant" | "admin" | null;
                         created: string;
                         closed_at: string | null;
                     };
