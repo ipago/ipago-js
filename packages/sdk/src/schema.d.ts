@@ -1421,6 +1421,38 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/admin/payouts/{payoutId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getAdminPayout"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/payouts/{payoutId}/settle": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["settleAdminPayout"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/admin/accounts/{accountId}": {
         parameters: {
             query?: never;
@@ -1816,6 +1848,22 @@ export interface paths {
         put?: never;
         post?: never;
         delete: operations["leaveAccount"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/accounts/{accountId}/payout-destination": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getAccountPayoutDestination"];
+        put: operations["setAccountPayoutDestination"];
+        post?: never;
+        delete?: never;
         options?: never;
         head?: never;
         patch?: never;
@@ -4052,6 +4100,12 @@ export interface operations {
                             currency: string;
                             status: string;
                             destination: string | null;
+                            bank_account: {
+                                holder_name: string;
+                                iban: string;
+                                bic: string | null;
+                            } | null;
+                            settlement_reference: string | null;
                             failure_reason: string | null;
                             created: string;
                             paid_at: string | null;
@@ -4127,6 +4181,12 @@ export interface operations {
                         currency: string;
                         status: string;
                         destination: string | null;
+                        bank_account: {
+                            holder_name: string;
+                            iban: string;
+                            bic: string | null;
+                        } | null;
+                        settlement_reference: string | null;
                         failure_reason: string | null;
                         created: string;
                         paid_at: string | null;
@@ -4245,6 +4305,12 @@ export interface operations {
                         currency: string;
                         status: string;
                         destination: string | null;
+                        bank_account: {
+                            holder_name: string;
+                            iban: string;
+                            bic: string | null;
+                        } | null;
+                        settlement_reference: string | null;
                         failure_reason: string | null;
                         created: string;
                         paid_at: string | null;
@@ -6753,6 +6819,12 @@ export interface operations {
                             currency: string;
                             status: string;
                             destination: string | null;
+                            bank_account: {
+                                holder_name: string;
+                                iban: string;
+                                bic: string | null;
+                            } | null;
+                            settlement_reference: string | null;
                             failure_reason: string | null;
                             created: string;
                             paid_at: string | null;
@@ -6830,6 +6902,12 @@ export interface operations {
                         currency: string;
                         status: string;
                         destination: string | null;
+                        bank_account: {
+                            holder_name: string;
+                            iban: string;
+                            bic: string | null;
+                        } | null;
+                        settlement_reference: string | null;
                         failure_reason: string | null;
                         created: string;
                         paid_at: string | null;
@@ -9932,6 +10010,12 @@ export interface operations {
                             currency: string;
                             status: string;
                             destination: string | null;
+                            bank_account: {
+                                holder_name: string;
+                                iban: string;
+                                bic: string | null;
+                            } | null;
+                            settlement_reference: string | null;
                             failure_reason: string | null;
                             created: string;
                             paid_at: string | null;
@@ -9992,6 +10076,12 @@ export interface operations {
                         currency: string;
                         status: string;
                         destination: string | null;
+                        bank_account: {
+                            holder_name: string;
+                            iban: string;
+                            bic: string | null;
+                        } | null;
+                        settlement_reference: string | null;
                         failure_reason: string | null;
                         created: string;
                         paid_at: string | null;
@@ -10339,6 +10429,260 @@ export interface operations {
             };
             /** @description Default Response */
             500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    getAdminPayout: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                payoutId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @enum {string} */
+                        object: "payout";
+                        id: string;
+                        amount: number;
+                        currency: string;
+                        status: string;
+                        destination: string | null;
+                        bank_account: {
+                            holder_name: string;
+                            iban: string;
+                            bic: string | null;
+                        } | null;
+                        settlement_reference: string | null;
+                        failure_reason: string | null;
+                        created: string;
+                        paid_at: string | null;
+                        store: {
+                            id: string;
+                            name: string;
+                            status: string;
+                        };
+                        bank_account_full: {
+                            holder_name: string;
+                            iban: string;
+                            country: string;
+                            bic: string | null;
+                            currency: string;
+                            destination_updated_at: string;
+                        } | null;
+                        destination_changed_recently: boolean;
+                        kyc_name: string | null;
+                    };
+                };
+            };
+            /** @description Default Response */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+            /** @description Default Response */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+            /** @description Default Response */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+            /** @description Default Response */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    settleAdminPayout: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                payoutId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @enum {string} */
+                    outcome: "paid" | "failed";
+                    reference?: string;
+                    reason?: string;
+                    allow_suspended?: boolean;
+                };
+            };
+        };
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @enum {string} */
+                        object: "payout";
+                        id: string;
+                        amount: number;
+                        currency: string;
+                        status: string;
+                        destination: string | null;
+                        bank_account: {
+                            holder_name: string;
+                            iban: string;
+                            bic: string | null;
+                        } | null;
+                        settlement_reference: string | null;
+                        failure_reason: string | null;
+                        created: string;
+                        paid_at: string | null;
+                        store: {
+                            id: string;
+                            name: string;
+                            status: string;
+                        };
+                        bank_account_full: {
+                            holder_name: string;
+                            iban: string;
+                            country: string;
+                            bic: string | null;
+                            currency: string;
+                            destination_updated_at: string;
+                        } | null;
+                        destination_changed_recently: boolean;
+                        kyc_name: string | null;
+                    };
+                };
+            };
+            /** @description Default Response */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+            /** @description Default Response */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+            /** @description Default Response */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+            /** @description Default Response */
+            404: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -13849,6 +14193,197 @@ export interface operations {
             };
             /** @description Default Response */
             409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    getAccountPayoutDestination: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                accountId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @enum {string} */
+                        object: "payout_destination";
+                        holder_name: string;
+                        iban: string;
+                        country: string;
+                        bic: string | null;
+                        currency: string;
+                        updated: string;
+                    };
+                };
+            };
+            /** @description Default Response */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+            /** @description Default Response */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    setAccountPayoutDestination: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                accountId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    holder_name: string;
+                    iban: string;
+                    bic?: string | null;
+                    /** @default eur */
+                    currency?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @enum {string} */
+                        object: "payout_destination";
+                        holder_name: string;
+                        iban: string;
+                        country: string;
+                        bic: string | null;
+                        currency: string;
+                        updated: string;
+                    };
+                };
+            };
+            /** @description Default Response */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+            /** @description Default Response */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+            /** @description Default Response */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+            /** @description Default Response */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+            /** @description Default Response */
+            503: {
                 headers: {
                     [name: string]: unknown;
                 };
