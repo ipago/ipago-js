@@ -3882,6 +3882,23 @@ export interface operations {
                     };
                 };
             };
+            /** @description Default Response */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
+                    };
+                };
+            };
         };
     };
     listOrders: {
@@ -16872,6 +16889,7 @@ export interface operations {
         parameters: {
             query?: {
                 preview?: string;
+                mode?: "live" | "test";
                 country?: string;
             };
             header?: never;
@@ -16891,6 +16909,8 @@ export interface operations {
                     "application/json": {
                         /** @enum {string} */
                         object: "storefront";
+                        /** @enum {string} */
+                        mode: "live" | "test";
                         slug: string | null;
                         name: string;
                         display_name: string | null;
@@ -16937,6 +16957,7 @@ export interface operations {
         parameters: {
             query?: {
                 preview?: string;
+                mode?: "live" | "test";
             };
             header?: never;
             path: {
@@ -16994,6 +17015,7 @@ export interface operations {
                 ending_before?: string;
                 category?: string;
                 preview?: string;
+                mode?: "live" | "test";
             };
             header?: never;
             path: {
@@ -17079,6 +17101,7 @@ export interface operations {
         parameters: {
             query?: {
                 preview?: string;
+                mode?: "live" | "test";
             };
             header?: never;
             path: {
@@ -17141,7 +17164,10 @@ export interface operations {
     };
     getStorefrontOrderBySession: {
         parameters: {
-            query?: never;
+            query?: {
+                preview?: string;
+                mode?: "live" | "test";
+            };
             header?: never;
             path: {
                 slug: string;
@@ -17195,7 +17221,10 @@ export interface operations {
     };
     getStorefrontSubscriptionBySession: {
         parameters: {
-            query?: never;
+            query?: {
+                preview?: string;
+                mode?: "live" | "test";
+            };
             header?: never;
             path: {
                 slug: string;
@@ -17246,7 +17275,10 @@ export interface operations {
     };
     createBasket: {
         parameters: {
-            query?: never;
+            query?: {
+                preview?: string;
+                mode?: "live" | "test";
+            };
             header?: never;
             path: {
                 slug: string;
@@ -17352,7 +17384,10 @@ export interface operations {
     };
     getBasket: {
         parameters: {
-            query?: never;
+            query?: {
+                preview?: string;
+                mode?: "live" | "test";
+            };
             header?: never;
             path: {
                 slug: string;
@@ -17448,7 +17483,10 @@ export interface operations {
     };
     addBasketItem: {
         parameters: {
-            query?: never;
+            query?: {
+                preview?: string;
+                mode?: "live" | "test";
+            };
             header?: never;
             path: {
                 slug: string;
@@ -17568,7 +17606,10 @@ export interface operations {
     };
     removeBasketItem: {
         parameters: {
-            query?: never;
+            query?: {
+                preview?: string;
+                mode?: "live" | "test";
+            };
             header?: never;
             path: {
                 slug: string;
@@ -17665,7 +17706,10 @@ export interface operations {
     };
     applyBasketCoupon: {
         parameters: {
-            query?: never;
+            query?: {
+                preview?: string;
+                mode?: "live" | "test";
+            };
             header?: never;
             path: {
                 slug: string;
@@ -17784,7 +17828,10 @@ export interface operations {
     };
     removeBasketCoupon: {
         parameters: {
-            query?: never;
+            query?: {
+                preview?: string;
+                mode?: "live" | "test";
+            };
             header?: never;
             path: {
                 slug: string;
@@ -17880,7 +17927,10 @@ export interface operations {
     };
     applyBasketGiftCard: {
         parameters: {
-            query?: never;
+            query?: {
+                preview?: string;
+                mode?: "live" | "test";
+            };
             header?: never;
             path: {
                 slug: string;
@@ -17999,7 +18049,10 @@ export interface operations {
     };
     removeBasketGiftCard: {
         parameters: {
-            query?: never;
+            query?: {
+                preview?: string;
+                mode?: "live" | "test";
+            };
             header?: never;
             path: {
                 slug: string;
@@ -18095,7 +18148,10 @@ export interface operations {
     };
     checkoutBasket: {
         parameters: {
-            query?: never;
+            query?: {
+                preview?: string;
+                mode?: "live" | "test";
+            };
             header?: never;
             path: {
                 slug: string;
@@ -18200,11 +18256,31 @@ export interface operations {
                     };
                 };
             };
+            /** @description Default Response */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
+                    };
+                };
+            };
         };
     };
     subscribeStorefront: {
         parameters: {
-            query?: never;
+            query?: {
+                preview?: string;
+                mode?: "live" | "test";
+            };
             header?: never;
             path: {
                 slug: string;
@@ -18274,6 +18350,23 @@ export interface operations {
             };
             /** @description Default Response */
             500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+            /** @description Default Response */
+            503: {
                 headers: {
                     [name: string]: unknown;
                 };
