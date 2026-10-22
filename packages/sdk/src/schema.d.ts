@@ -1741,7 +1741,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/v1/stores/{storeId}/game-servers/{serverId}/roll": {
+    "/v1/stores/{storeId}/game-servers/rcon-test": {
         parameters: {
             query?: never;
             header?: never;
@@ -1750,7 +1750,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        post: operations["rollStoreGameServerToken"];
+        post: operations["testStoreRconConnection"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1768,6 +1768,22 @@ export interface paths {
         put?: never;
         post?: never;
         delete: operations["revokeStoreGameServer"];
+        options?: never;
+        head?: never;
+        patch: operations["updateStoreGameServer"];
+        trace?: never;
+    };
+    "/v1/stores/{storeId}/game-servers/{serverId}/roll": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["rollStoreGameServerToken"];
+        delete?: never;
         options?: never;
         head?: never;
         patch?: never;
@@ -12618,7 +12634,13 @@ export interface operations {
                             id: string;
                             name: string;
                             mode: string;
+                            /** @enum {string} */
+                            transport: "plugin" | "rcon";
                             masked: string | null;
+                            rcon: {
+                                host: string;
+                                port: number;
+                            } | null;
                             last_seen_at: string | null;
                             created: string;
                             revoked_at: string | null;
@@ -12695,6 +12717,16 @@ export interface operations {
             content: {
                 "application/json": {
                     name: string;
+                    /**
+                     * @default plugin
+                     * @enum {string}
+                     */
+                    transport?: "plugin" | "rcon";
+                    rcon?: {
+                        host: string;
+                        port: number;
+                        password: string;
+                    };
                 };
             };
         };
@@ -12711,11 +12743,17 @@ export interface operations {
                         id: string;
                         name: string;
                         mode: string;
+                        /** @enum {string} */
+                        transport: "plugin" | "rcon";
                         masked: string | null;
+                        rcon: {
+                            host: string;
+                            port: number;
+                        } | null;
                         last_seen_at: string | null;
                         created: string;
                         revoked_at: string | null;
-                        token: string;
+                        token: string | null;
                     };
                 };
             };
@@ -12804,9 +12842,26 @@ export interface operations {
                     };
                 };
             };
+            /** @description Default Response */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
+                    };
+                };
+            };
         };
     };
-    rollStoreGameServerToken: {
+    testStoreRconConnection: {
         parameters: {
             query?: {
                 mode?: "live" | "test";
@@ -12814,11 +12869,18 @@ export interface operations {
             header?: never;
             path: {
                 storeId: string;
-                serverId: string;
             };
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody: {
+            content: {
+                "application/json": {
+                    host: string;
+                    port: number;
+                    password: string;
+                };
+            };
+        };
         responses: {
             /** @description Default Response */
             200: {
@@ -12828,15 +12890,30 @@ export interface operations {
                 content: {
                     "application/json": {
                         /** @enum {string} */
-                        object: "game_server";
-                        id: string;
-                        name: string;
-                        mode: string;
-                        masked: string | null;
-                        last_seen_at: string | null;
-                        created: string;
-                        revoked_at: string | null;
-                        token: string;
+                        object: "rcon_test";
+                        ok: boolean;
+                        /** @enum {string} */
+                        stage: "connected" | "auth_failed" | "unreachable" | "timeout" | "protocol_error";
+                        message: string;
+                        response: string | null;
+                        latency_ms: number;
+                    };
+                };
+            };
+            /** @description Default Response */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
                     };
                 };
             };
@@ -12919,10 +12996,280 @@ export interface operations {
                         id: string;
                         name: string;
                         mode: string;
+                        /** @enum {string} */
+                        transport: "plugin" | "rcon";
                         masked: string | null;
+                        rcon: {
+                            host: string;
+                            port: number;
+                        } | null;
                         last_seen_at: string | null;
                         created: string;
                         revoked_at: string | null;
+                    };
+                };
+            };
+            /** @description Default Response */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+            /** @description Default Response */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+            /** @description Default Response */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+            /** @description Default Response */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    updateStoreGameServer: {
+        parameters: {
+            query?: {
+                mode?: "live" | "test";
+            };
+            header?: never;
+            path: {
+                storeId: string;
+                serverId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    name?: string;
+                    rcon?: {
+                        host?: string;
+                        port?: number;
+                        password?: string;
+                    };
+                };
+            };
+        };
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @enum {string} */
+                        object: "game_server";
+                        id: string;
+                        name: string;
+                        mode: string;
+                        /** @enum {string} */
+                        transport: "plugin" | "rcon";
+                        masked: string | null;
+                        rcon: {
+                            host: string;
+                            port: number;
+                        } | null;
+                        last_seen_at: string | null;
+                        created: string;
+                        revoked_at: string | null;
+                    };
+                };
+            };
+            /** @description Default Response */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+            /** @description Default Response */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+            /** @description Default Response */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+            /** @description Default Response */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+            /** @description Default Response */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+            /** @description Default Response */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    rollStoreGameServerToken: {
+        parameters: {
+            query?: {
+                mode?: "live" | "test";
+            };
+            header?: never;
+            path: {
+                storeId: string;
+                serverId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @enum {string} */
+                        object: "game_server";
+                        id: string;
+                        name: string;
+                        mode: string;
+                        /** @enum {string} */
+                        transport: "plugin" | "rcon";
+                        masked: string | null;
+                        rcon: {
+                            host: string;
+                            port: number;
+                        } | null;
+                        last_seen_at: string | null;
+                        created: string;
+                        revoked_at: string | null;
+                        token: string;
                     };
                 };
             };
