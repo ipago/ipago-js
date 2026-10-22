@@ -2749,6 +2749,38 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/admin/risk": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["listAdminRisk"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/stores/{storeId}/risk": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getAdminStoreRisk"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -20854,6 +20886,200 @@ export interface operations {
                             requested_by: string | null;
                             created: string;
                         }[];
+                    };
+                };
+            };
+            /** @description Default Response */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+            /** @description Default Response */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+            /** @description Default Response */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    listAdminRisk: {
+        parameters: {
+            query?: {
+                days?: number;
+                include_ok?: "true" | "false";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @enum {string} */
+                        object: "list";
+                        window_days: number;
+                        generated_at: string;
+                        data: {
+                            /** @enum {string} */
+                            object: "store_risk";
+                            store: string;
+                            name: string;
+                            status: string;
+                            currency: string;
+                            account: string;
+                            verification_status: string | null;
+                            live_since: string;
+                            gmv: number;
+                            paid_orders: number;
+                            /** @enum {string} */
+                            level: "ok" | "watch" | "high";
+                            signals: {
+                                /** @enum {string} */
+                                key: "dispute_rate" | "refund_rate_count" | "refund_rate_amount" | "sales_velocity" | "new_store_volume" | "aov_spike" | "orders_per_email_24h" | "emails_per_username" | "cards_per_username";
+                                /** @enum {string} */
+                                unit: "bps" | "ratio" | "count" | "minor_units";
+                                value: number | null;
+                                threshold: {
+                                    watch: number;
+                                    high: number;
+                                };
+                                /** @enum {string} */
+                                level: "ok" | "watch" | "high";
+                            }[];
+                        }[];
+                    };
+                };
+            };
+            /** @description Default Response */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+            /** @description Default Response */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    getAdminStoreRisk: {
+        parameters: {
+            query?: {
+                days?: number;
+            };
+            header?: never;
+            path: {
+                storeId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @enum {string} */
+                        object: "store_risk";
+                        store: string;
+                        name: string;
+                        status: string;
+                        currency: string;
+                        account: string;
+                        verification_status: string | null;
+                        live_since: string;
+                        gmv: number;
+                        paid_orders: number;
+                        /** @enum {string} */
+                        level: "ok" | "watch" | "high";
+                        signals: {
+                            /** @enum {string} */
+                            key: "dispute_rate" | "refund_rate_count" | "refund_rate_amount" | "sales_velocity" | "new_store_volume" | "aov_spike" | "orders_per_email_24h" | "emails_per_username" | "cards_per_username";
+                            /** @enum {string} */
+                            unit: "bps" | "ratio" | "count" | "minor_units";
+                            value: number | null;
+                            threshold: {
+                                watch: number;
+                                high: number;
+                            };
+                            /** @enum {string} */
+                            level: "ok" | "watch" | "high";
+                        }[];
+                        window_days: number;
+                        generated_at: string;
                     };
                 };
             };
