@@ -749,6 +749,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/me/totp/recovery-codes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["regenerateRecoveryCodes"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/me/totp/disable": {
         parameters: {
             query?: never;
@@ -6199,6 +6215,7 @@ export interface operations {
                         /** @enum {string} */
                         object: "user_totp";
                         enrolled: boolean;
+                        recovery_codes_remaining: number;
                     };
                 };
             };
@@ -6306,6 +6323,71 @@ export interface operations {
                         object: "user_totp";
                         /** @enum {boolean} */
                         enrolled: true;
+                        recovery_codes: string[];
+                    };
+                };
+            };
+            /** @description Default Response */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+            /** @description Default Response */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    regenerateRecoveryCodes: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    code: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @enum {string} */
+                        object: "user_recovery_codes";
+                        recovery_codes: string[];
                     };
                 };
             };
