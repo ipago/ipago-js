@@ -1,6 +1,6 @@
 import { mount } from "./checkout.js";
 
-export const TwoPayCheckout = { mount };
+export const IPagoCheckout = { mount };
 
 export { mount };
 

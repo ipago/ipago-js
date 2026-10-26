@@ -6,16 +6,16 @@ export function renderForm(
   onSubmit: (values: Record<string, string>) => void
 ): { destroy: () => void } {
   const form = document.createElement("form");
-  form.className = "twopay-form";
+  form.className = "ipago-form";
 
   // Map from field key to its input or select element
   const inputs = new Map<string, HTMLInputElement | HTMLSelectElement>();
 
   for (const field of fields) {
     const wrapper = document.createElement("div");
-    wrapper.className = "twopay-field";
+    wrapper.className = "ipago-field";
 
-    const fieldId = `twopay-${field.key}`;
+    const fieldId = `ipago-${field.key}`;
 
     const label = document.createElement("label");
     label.textContent = field.label;
@@ -61,7 +61,7 @@ export function renderForm(
     event.preventDefault();
 
     // Clear prior errors
-    const priorErrors = form.querySelectorAll(".twopay-error");
+    const priorErrors = form.querySelectorAll(".ipago-error");
     for (const el of priorErrors) {
       el.remove();
     }
@@ -74,7 +74,7 @@ export function renderForm(
       if (!control || control.value.trim() === "") {
         valid = false;
         const error = document.createElement("span");
-        error.className = "twopay-error";
+        error.className = "ipago-error";
         error.textContent = `${field.label} is required`;
         control?.parentElement?.appendChild(error);
       }

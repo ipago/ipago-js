@@ -1,5 +1,5 @@
-export { TwoPay, TwoPayError } from "./client.js";
-export type { TwoPayOptions, RequestOptions } from "./client.js";
+export { IPago, IPagoError } from "./client.js";
+export type { IPagoOptions, RequestOptions } from "./client.js";
 export type { paths } from "./schema.js";
 export {
   verifyWebhookSignature,

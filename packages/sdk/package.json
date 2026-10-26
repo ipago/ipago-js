@@ -1,7 +1,7 @@
 {
-  "name": "@2pay/sdk",
+  "name": "@ipago/sdk",
   "version": "0.1.0",
-  "description": "Server-side client for the 2Pay Developer API, with webhook signature verification.",
+  "description": "Server-side client for the iPago Developer API, with webhook signature verification.",
   "license": "UNLICENSED",
   "private": true,
   "type": "module",

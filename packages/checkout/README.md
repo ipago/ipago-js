@@ -1,4 +1,4 @@
-# @2pay/checkout
+# @ipago/checkout
 
 A lightweight browser library that renders a merchant-configured pre-checkout form, collects the field values, passes them to the merchant's own server via a `createSession` callback, and then mounts Stripe Embedded Checkout using the `clientSecret` the server returns. The library never touches a secret key; all session creation happens server-side.
 
@@ -6,26 +6,26 @@ A lightweight browser library that renders a merchant-configured pre-checkout fo
 
 ## Hosted script
 
-Add the script tag to your page. On production, load it from the 2Pay CDN:
+Add the script tag to your page. On production, load it from the iPago CDN:
 
 ```html
-<script src="https://js.2pay.gg/v1/checkout.js"></script>
+<script src="https://js.ipago.io/v1/checkout.js"></script>
 ```
 
-Then call `TwoPayCheckout.mount`:
+Then call `IPagoCheckout.mount`:
 
 ```html
 <div id="checkout"></div>
 
-<script src="https://js.2pay.gg/v1/checkout.js"></script>
+<script src="https://js.ipago.io/v1/checkout.js"></script>
 <script>
-  TwoPayCheckout.mount({
+  IPagoCheckout.mount({
     element: "#checkout",
     fields: [
       { key: "player_name", label: "Minecraft username", type: "text", required: true },
       { key: "email",        label: "Email",             type: "email", required: true }
     ],
-    publishableKey: "pk_live_your_2pay_publishable_key",
+    publishableKey: "pk_live_your_ipago_publishable_key",
     createSession: async (values) => {
       const res = await fetch("/create-checkout", {
         method: "POST",
@@ -46,21 +46,21 @@ Then call `TwoPayCheckout.mount`:
 Install the package:
 
 ```bash
-pnpm add @2pay/checkout
+pnpm add @ipago/checkout
 ```
 
 Import and call `mount` from your own bundled script:
 
 ```ts
-import { TwoPayCheckout } from "@2pay/checkout";
+import { IPagoCheckout } from "@ipago/checkout";
 
-TwoPayCheckout.mount({
+IPagoCheckout.mount({
   element: "#checkout",
   fields: [
     { key: "player_name", label: "Minecraft username", type: "text", required: true },
     { key: "email",        label: "Email",             type: "email", required: true }
   ],
-  publishableKey: "pk_live_your_2pay_publishable_key",
+  publishableKey: "pk_live_your_ipago_publishable_key",
   createSession: async (values) => {
     const res = await fetch("/create-checkout", {
       method: "POST",
@@ -93,11 +93,11 @@ Session creation always happens on the merchant's server, never in the browser:
 
 1. The user fills in the pre-checkout form and submits it.
 2. The library calls `createSession(values)`, which is a function **you** provide.
-3. Your function calls your own server, which calls `POST /v1/checkouts` on the 2Pay API using your **secret key**. The secret key is never sent to the browser.
+3. Your function calls your own server, which calls `POST /v1/checkouts` on the iPago API using your **secret key**. The secret key is never sent to the browser.
 4. Your server returns `{ clientSecret }` to the browser.
 5. The library passes that `clientSecret` to Stripe Embedded Checkout.
 
-`publishableKey` is a public 2Pay Stripe publishable key. It is safe to embed in frontend code.
+`publishableKey` is a public iPago Stripe publishable key. It is safe to embed in frontend code.
 
 ---
 
@@ -123,7 +123,7 @@ Your server is responsible for mapping the values to the right `POST /v1/checkou
 | `element`       | `string \| HTMLElement`                                     | Yes      | CSS selector or DOM element where the checkout will be rendered.            |
 | `fields`        | `Field[]`                                                   | Yes      | Merchant-defined form fields shown before the payment step.                 |
 | `createSession` | `(values: Record<string, string>) => Promise<{clientSecret: string}>` | Yes | Called after form submission; must return `{ clientSecret }` from your server. |
-| `publishableKey`| `string`                                                    | Yes      | Your public 2Pay Stripe publishable key.                                    |
+| `publishableKey`| `string`                                                    | Yes      | Your public iPago Stripe publishable key.                                    |
 | `onComplete`    | `(result: { sessionId?: string }) => void`                  | No       | Called when the payment completes successfully.                             |
 | `onError`       | `(error: Error) => void`                                    | No       | Called if an error occurs at any stage.                                     |
 

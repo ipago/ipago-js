@@ -48,14 +48,14 @@ type CompleteDeliveryBody = operations["completeDelivery"]["requestBody"]["conte
 type FailDeliveryBody = operations["failDelivery"]["requestBody"]["content"]["application/json"];
 type ListDisputesQuery = operations["listDisputes"]["parameters"]["query"];
 
-export class TwoPayError extends Error {
+export class IPagoError extends Error {
   constructor(readonly status: number, readonly body: unknown) {
-    super(`2Pay API error ${status}`);
-    this.name = "TwoPayError";
+    super(`iPago API error ${status}`);
+    this.name = "IPagoError";
   }
 }
 
-export type TwoPayOptions = { baseUrl: string; apiKey: string; fetchImpl?: typeof fetch };
+export type IPagoOptions = { baseUrl: string; apiKey: string; fetchImpl?: typeof fetch };
 
 export type RequestOptions = {
   /**
@@ -68,12 +68,12 @@ export type RequestOptions = {
   idempotencyKey?: string;
 };
 
-export class TwoPay {
+export class IPago {
   private readonly baseUrl: string;
   private readonly apiKey: string;
   private readonly fetchImpl: typeof fetch;
 
-  constructor(opts: TwoPayOptions) {
+  constructor(opts: IPagoOptions) {
     this.baseUrl = opts.baseUrl.replace(/\/$/, "");
     this.apiKey = opts.apiKey;
     this.fetchImpl = opts.fetchImpl ?? fetch;
@@ -95,7 +95,7 @@ export class TwoPay {
     });
     if (!res.ok) {
       const body = await res.json().catch(() => ({}));
-      throw new TwoPayError(res.status, body);
+      throw new IPagoError(res.status, body);
     }
     return (await res.json()) as T;
   }
@@ -113,7 +113,7 @@ export class TwoPay {
     });
     if (!res.ok) {
       const errBody = await res.json().catch(() => ({}));
-      throw new TwoPayError(res.status, errBody);
+      throw new IPagoError(res.status, errBody);
     }
     return (await res.json()) as T;
   }
@@ -125,7 +125,7 @@ export class TwoPay {
     });
     if (!res.ok) {
       const body = await res.json().catch(() => ({}));
-      throw new TwoPayError(res.status, body);
+      throw new IPagoError(res.status, body);
     }
     return (await res.json()) as T;
   }
@@ -145,7 +145,7 @@ export class TwoPay {
     });
     if (!res.ok) {
       const errBody = await res.json().catch(() => ({}));
-      throw new TwoPayError(res.status, errBody);
+      throw new IPagoError(res.status, errBody);
     }
     return (await res.json()) as T;
   }

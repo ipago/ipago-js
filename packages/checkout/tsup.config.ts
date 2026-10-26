@@ -5,9 +5,9 @@ export default defineConfig([
   {
     entry: { checkout: "src/global.ts" },
     format: ["iife"],
-    globalName: "TwoPayCheckout",
+    globalName: "IPagoCheckout",
     clean: false,
-    // dist/checkout.global.js is deployed to the CDN as https://js.2pay.gg/v1/checkout.js (the deploy step renames it)
+    // dist/checkout.global.js is deployed to the CDN as https://js.ipago.io/v1/checkout.js (the deploy step renames it)
     outExtension: () => ({ js: ".global.js" }),
   },
 ]);

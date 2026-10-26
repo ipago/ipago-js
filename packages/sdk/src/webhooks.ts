@@ -1,5 +1,5 @@
 /**
- * Verifying that a webhook really came from 2Pay.
+ * Verifying that a webhook really came from iPago.
  *
  * This is the one piece of an integration that is genuinely dangerous to write by hand. The
  * usual mistakes are comparing digests with `===` (leaking the secret a byte at a time under
@@ -12,8 +12,8 @@
  * site is deployed, which is very often not a plain Node server.
  */
 
-/** Header 2Pay signs every delivery with. */
-export const SIGNATURE_HEADER = "2pay-signature";
+/** Header iPago signs every delivery with. */
+export const SIGNATURE_HEADER = "ipago-signature";
 
 /** How far apart the delivery's timestamp and your clock may be. Five minutes, like the docs. */
 export const DEFAULT_TOLERANCE_SECONDS = 300;
@@ -28,7 +28,7 @@ export class WebhookVerificationError extends Error {
 export type ParsedSignature = { timestamp: number; digests: string[] };
 
 /**
- * Parse a `2Pay-Signature` header: `t=<unix seconds>,v1=<hex>[,v1=<hex>]`.
+ * Parse a `iPago-Signature` header: `t=<unix seconds>,v1=<hex>[,v1=<hex>]`.
  *
  * More than one `v1` appears while a signing secret is being rotated: the delivery is signed
  * with both the new and the previous secret so a receiver that has not been redeployed yet
@@ -88,7 +88,7 @@ function timingSafeEqualHex(a: string, b: string): boolean {
 export type VerifyOptions = {
   /** The raw request body, EXACTLY as received. Never a re-serialised object. */
   payload: string;
-  /** The `2Pay-Signature` header value. */
+  /** The `iPago-Signature` header value. */
   signature: string;
   /** The endpoint's signing secret, `whsec_...`. */
   secret: string;
@@ -102,7 +102,7 @@ export type VerifyOptions = {
  * Throw unless `payload` was signed by `secret` recently.
  *
  * Pass the raw body, not a parsed object: JSON.stringify of a parsed body reorders keys and
- * changes whitespace, and the digest is over the exact bytes 2Pay sent. In Express reach for
+ * changes whitespace, and the digest is over the exact bytes iPago sent. In Express reach for
  * `express.raw({ type: 'application/json' })`; in a fetch-style handler use `await req.text()`
  * and parse afterwards.
  */

@@ -1,5 +1,5 @@
 {
-  "name": "@2pay/checkout",
+  "name": "@ipago/checkout",
   "version": "0.0.0",
   "private": true,
   "type": "module",

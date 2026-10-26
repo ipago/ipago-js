@@ -13,7 +13,7 @@ export function mount(options: MountOptions): { unmount: () => void } {
   if (typeof options.element === "string") {
     const found = document.querySelector(options.element);
     if (!(found instanceof HTMLElement)) {
-      throw new Error("2Pay Checkout: element not found: " + options.element);
+      throw new Error("iPago Checkout: element not found: " + options.element);
     }
     el = found;
   } else {
@@ -40,7 +40,7 @@ export function mount(options: MountOptions): { unmount: () => void } {
     } catch (err) {
       const error = err instanceof Error ? err : new Error(String(err));
       if (options.onError) options.onError(error);
-      else console.error("[2Pay Checkout] Unhandled error:", error);
+      else console.error("[iPago Checkout] Unhandled error:", error);
     }
   });
 

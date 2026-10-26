@@ -1,8 +1,8 @@
-# @2pay/sdk
+# @ipago/sdk
 
-Server-side client for the [2Pay](https://2pay.gg) Developer API.
+Server-side client for the [iPago](https://ipago.io) Developer API.
 
-2Pay is the Merchant of Record: it takes the payment, computes and remits VAT, and pays you out.
+iPago is the Merchant of Record: it takes the payment, computes and remits VAT, and pays you out.
 This package is the typed client for the API behind that, plus the one piece of an integration
 that is genuinely risky to write by hand, verifying that a webhook really came from us.
 
@@ -12,7 +12,7 @@ Workers, Vercel Edge). No dependencies.
 ## Install
 
 ```bash
-npm install @2pay/sdk
+npm install @ipago/sdk
 ```
 
 ## Authenticate
@@ -22,11 +22,11 @@ A key is scoped to one store and one mode, and its prefix tells you which: `sk_l
 real money, `sk_test_...` does not.
 
 ```ts
-import { TwoPay } from "@2pay/sdk";
+import { IPago } from "@ipago/sdk";
 
-const twopay = new TwoPay({
-  baseUrl: "https://api.2pay.gg",
-  apiKey: process.env.TWOPAY_SECRET_KEY!,
+const iPago = new IPago({
+  baseUrl: "https://api.ipago.io",
+  apiKey: process.env.IPAGO_SECRET_KEY!,
 });
 ```
 
@@ -36,7 +36,7 @@ can spend your money.
 ## Create a checkout
 
 ```ts
-const checkout = await twopay.checkouts.create(
+const checkout = await iPago.checkouts.create(
   {
     items: [{ product: "prod_...", quantity: 1 }],
     customer_email: "buyer@example.com",
@@ -56,18 +56,18 @@ Amounts are always integers in the currency's minor unit: `1000` is 10.00 PLN.
 
 ## Verify a webhook
 
-Every delivery carries a `2Pay-Signature` header. Verify it before you trust anything in the
+Every delivery carries a `iPago-Signature` header. Verify it before you trust anything in the
 body, and verify the **raw bytes** you received, not a parsed and re-serialised object.
 
 ```ts
-import { constructWebhookEvent, WebhookVerificationError } from "@2pay/sdk";
+import { constructWebhookEvent, WebhookVerificationError } from "@ipago/sdk";
 
-app.post("/webhooks/2pay", express.raw({ type: "application/json" }), async (req, res) => {
+app.post("/webhooks/ipago", express.raw({ type: "application/json" }), async (req, res) => {
   try {
     const event = await constructWebhookEvent<{ type: string; data: unknown }>({
       payload: req.body.toString("utf8"),
-      signature: req.header("2Pay-Signature")!,
-      secret: process.env.TWOPAY_WEBHOOK_SECRET!,
+      signature: req.header("iPago-Signature")!,
+      secret: process.env.IPAGO_WEBHOOK_SECRET!,
     });
 
     if (event.type === "order.paid") {
@@ -98,15 +98,15 @@ Respond `2xx` quickly and do the work afterwards. A non-2xx is retried with back
 
 ## Errors
 
-Anything that is not a 2xx throws `TwoPayError`, carrying the status and the parsed body.
+Anything that is not a 2xx throws `IPagoError`, carrying the status and the parsed body.
 
 ```ts
-import { TwoPayError } from "@2pay/sdk";
+import { IPagoError } from "@ipago/sdk";
 
 try {
-  await twopay.orders.retrieve("order_nope");
+  await iPago.orders.retrieve("order_nope");
 } catch (err) {
-  if (err instanceof TwoPayError) {
+  if (err instanceof IPagoError) {
     console.error(err.status, err.body); // 404, { error: { type, code, message, request_id } }
   }
 }

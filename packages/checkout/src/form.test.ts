@@ -77,7 +77,7 @@ describe("renderForm", () => {
     expect(onSubmit).not.toHaveBeenCalled();
 
     // error nodes should appear for the two required-but-empty fields
-    const errors = container.querySelectorAll(".twopay-error");
+    const errors = container.querySelectorAll(".ipago-error");
     expect(errors.length).toBe(2);
   });
 
@@ -113,7 +113,7 @@ describe("renderForm", () => {
 
     // first submit with empty fields to generate errors
     form.dispatchEvent(new Event("submit", { cancelable: true, bubbles: true }));
-    expect(container.querySelectorAll(".twopay-error").length).toBeGreaterThan(0);
+    expect(container.querySelectorAll(".ipago-error").length).toBeGreaterThan(0);
 
     // fill required fields and submit again
     const nameInput =
@@ -126,7 +126,7 @@ describe("renderForm", () => {
     form.dispatchEvent(new Event("submit", { cancelable: true, bubbles: true }));
 
     expect(onSubmit).toHaveBeenCalledTimes(1);
-    expect(container.querySelectorAll(".twopay-error").length).toBe(0);
+    expect(container.querySelectorAll(".ipago-error").length).toBe(0);
   });
 
   it("destroy() removes rendered nodes from the container", () => {

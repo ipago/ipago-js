@@ -28,7 +28,7 @@ describe("mount", () => {
     });
 
     const app = document.getElementById("app")!;
-    expect(app.querySelector("form.twopay-form")).toBeTruthy();
+    expect(app.querySelector("form.ipago-form")).toBeTruthy();
   });
 
   it("calls createSession with field values and then mountPayment on submit", async () => {
@@ -97,7 +97,7 @@ describe("mount", () => {
         createSession: vi.fn(async () => ({ clientSecret: "cs" })),
         publishableKey: "pk_test",
       })
-    ).toThrow("2Pay Checkout: element not found: #nope");
+    ).toThrow("iPago Checkout: element not found: #nope");
   });
 
   it("calls onError and does not call mountPayment when createSession returns no clientSecret", async () => {
@@ -124,7 +124,7 @@ describe("mount", () => {
 
     expect(onError).toHaveBeenCalledWith(expect.any(Error));
     expect(mockedMountPayment).not.toHaveBeenCalled();
-    expect(app.querySelector("form.twopay-form")).toBeTruthy();
+    expect(app.querySelector("form.ipago-form")).toBeTruthy();
   });
 
   it("keeps the form in the DOM when mountPayment rejects", async () => {
@@ -151,7 +151,7 @@ describe("mount", () => {
     await vi.waitFor(() => expect(onError).toHaveBeenCalled());
 
     expect(onError).toHaveBeenCalledWith(expect.any(Error));
-    expect(app.querySelector("form.twopay-form")).toBeTruthy();
+    expect(app.querySelector("form.ipago-form")).toBeTruthy();
     expect(app.querySelector("input[name='player_name']")).toBeTruthy();
   });
 
@@ -176,7 +176,7 @@ describe("mount", () => {
 
     await vi.waitFor(() => expect(consoleSpy).toHaveBeenCalled());
 
-    expect(consoleSpy).toHaveBeenCalledWith("[2Pay Checkout] Unhandled error:", expect.any(Error));
+    expect(consoleSpy).toHaveBeenCalledWith("[iPago Checkout] Unhandled error:", expect.any(Error));
     consoleSpy.mockRestore();
   });
 
