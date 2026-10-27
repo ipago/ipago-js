@@ -122,7 +122,8 @@ management.
 
 `products`, `categories`, `checkouts`, `orders`, `refunds`, `payouts`, `balance`, `ledger`,
 `deliveries`, `disputes`, `events` and `webhookEndpoints`. The types are generated from the
-OpenAPI document the API serves at `/openapi.json`, so they cannot drift from the real thing.
+OpenAPI document pinned in this repository (`openapi/openapi.json`), which tracks a release
+of [ipago/platform](https://github.com/ipago/platform). Regenerate with `pnpm generate:sdk`.
 
 ## Versioning
 

@@ -1,0 +1,6 @@
+{
+  "repository": "ipago/platform",
+  "release": "unreleased",
+  "spec": "openapi.json",
+  "generator": "openapi-typescript@7.13.0"
+}

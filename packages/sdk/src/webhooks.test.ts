@@ -12,9 +12,9 @@ const NOW = 1_800_000_000;
 const now = () => NOW;
 
 /**
- * Sign exactly the way the API does (apps/api/src/kernel/webhook-crypto.ts), using node:crypto
- * rather than the module under test. A helper that reused the SDK's own HMAC could agree with
- * it while both were wrong.
+ * Sign exactly the way the iPago API signs deliveries, using node:crypto rather than the
+ * module under test. A helper that reused the SDK's own HMAC could agree with it while both
+ * were wrong.
  */
 function sign(body: string, opts: { secret?: string; timestamp?: number; extraSecrets?: string[] } = {}): string {
   const t = opts.timestamp ?? NOW;
@@ -113,7 +113,6 @@ describe("verifyWebhookSignature", () => {
     // The commonest integration bug: parsing the body, then verifying JSON.stringify of the
     // result. Key order and whitespace change, so the digest cannot match. The test exists to
     // pin that this is a real failure and not something the SDK quietly tolerates.
-    const signature = sign(BODY);
     const reserialised = JSON.stringify(JSON.parse(BODY.replace('{"id"', '{ "id"')));
     const spacedBody = BODY.replace('{"id"', '{ "id"');
     expect(spacedBody).not.toBe(reserialised);

@@ -1,0 +1,54 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "sdk-v*"
+      - "checkout-v*"
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          registry-url: https://registry.npmjs.org
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Publish the package named by the tag
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          set -euo pipefail
+          tag="${GITHUB_REF_NAME}"
+          case "$tag" in
+            sdk-v*)
+              name="@ipago/sdk"
+              dir="packages/sdk"
+              version="${tag#sdk-v}"
+              ;;
+            checkout-v*)
+              name="@ipago/checkout"
+              dir="packages/checkout"
+              version="${tag#checkout-v}"
+              ;;
+            *)
+              echo "tag ${tag} is not an sdk-v* or checkout-v* tag" >&2
+              exit 1
+              ;;
+          esac
+          pkg_version="$(node -p "require('./${dir}/package.json').version")"
+          if [[ "$pkg_version" != "$version" ]]; then
+            echo "tag ${tag} does not match ${name} version ${pkg_version}" >&2
+            exit 1
+          fi
+          pnpm --filter "$name" publish --access public --no-git-checks
