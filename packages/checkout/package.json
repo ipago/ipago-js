@@ -1,18 +1,45 @@
 {
   "name": "@ipago/checkout",
   "version": "0.0.0",
-  "private": true,
+  "description": "Browser pre-checkout form that mounts Stripe Embedded Checkout.",
+  "license": "UNLICENSED",
   "type": "module",
+  "engines": {
+    "node": ">=18"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ipago/ipago-js.git",
+    "directory": "packages/checkout"
+  },
   "main": "./dist/index.js",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
-  "exports": { ".": { "types": "./dist/index.d.ts", "import": "./dist/index.js" } },
-  "files": ["dist"],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "build": "tsup",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test": "vitest run"
+    "test": "vitest run",
+    "prepublishOnly": "pnpm run build"
   },
-  "dependencies": { "@stripe/stripe-js": "^4.0.0" },
-  "devDependencies": { "tsup": "^8.0.0", "typescript": "5.7.3", "vitest": "^2.0.0", "jsdom": "^25.0.0" }
+  "dependencies": {
+    "@stripe/stripe-js": "^4.0.0"
+  },
+  "devDependencies": {
+    "jsdom": "^25.0.0",
+    "tsup": "^8.0.0",
+    "typescript": "5.7.3",
+    "vitest": "^2.0.0"
+  }
 }
