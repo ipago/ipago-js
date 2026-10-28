@@ -66,7 +66,7 @@ pnpm generate:sdk --from-pin
 
 regenerates from the committed spec and should produce no diff. CI runs this and fails if the types drift.
 
-The pinned document currently has `"release": "unreleased"`. It was recovered from the generated types already in the repository: `ipago/platform` is not reachable from here, and the original OpenAPI file was not part of this history. It regenerates `schema.d.ts` exactly. Integer formats and security schemes that `openapi-typescript` does not keep in the types are not in the pin. Replace the pin by running `pnpm generate:sdk` against a real platform release when one is published.
+The pinned document currently has `"release": "unreleased"`: `ipago/platform` has not published a release yet. It is the `openapi.json` that `pnpm openapi:gen` writes on `ipago/platform` `main`, copied into `packages/sdk/openapi/openapi.json` and regenerated with `pnpm generate:sdk --from-pin`. Replace the pin by running `pnpm generate:sdk` against a real platform release when one is published.
 
 ## Publish
 
