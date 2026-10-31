@@ -2512,6 +2512,10 @@
                     "type": "string",
                     "minLength": 2,
                     "maxLength": 2
+                  },
+                  "withdrawal_waiver": {
+                    "description": "Pass true once your checkout has asked the buyer to agree to immediate delivery and to losing the 14-day right of withdrawal. iPago records the time on the order.",
+                    "type": "boolean"
                   }
                 },
                 "required": [
@@ -3231,6 +3235,11 @@
                             "nullable": true,
                             "type": "string"
                           },
+                          "withdrawal_waiver_at": {
+                            "nullable": true,
+                            "description": "When the buyer agreed to immediate delivery and to losing the 14-day right of withdrawal. Null when no consent was recorded.",
+                            "type": "string"
+                          },
                           "refunded_at": {
                             "nullable": true,
                             "type": "string"
@@ -3262,6 +3271,7 @@
                           "card_last4",
                           "payment_evidence",
                           "decline_reason",
+                          "withdrawal_waiver_at",
                           "created",
                           "paid_at"
                         ],
@@ -3729,6 +3739,11 @@
                       "nullable": true,
                       "type": "string"
                     },
+                    "withdrawal_waiver_at": {
+                      "nullable": true,
+                      "description": "When the buyer agreed to immediate delivery and to losing the 14-day right of withdrawal. Null when no consent was recorded.",
+                      "type": "string"
+                    },
                     "refunded_at": {
                       "nullable": true,
                       "type": "string"
@@ -3760,6 +3775,7 @@
                     "card_last4",
                     "payment_evidence",
                     "decline_reason",
+                    "withdrawal_waiver_at",
                     "created",
                     "paid_at"
                   ],
@@ -7610,6 +7626,15 @@
                               "admin"
                             ]
                           },
+                          "fault": {
+                            "type": "string",
+                            "enum": [
+                              "unset",
+                              "supplier",
+                              "ipago"
+                            ],
+                            "description": "iPago's finding on who caused the dispute. The supplier pays the dispute fee only for supplier."
+                          },
                           "created": {
                             "type": "string"
                           },
@@ -7630,6 +7655,7 @@
                           "evidence_submitted_at",
                           "evidence_text",
                           "evidence_submitted_by",
+                          "fault",
                           "created",
                           "closed_at"
                         ],
@@ -7807,6 +7833,15 @@
                         "admin"
                       ]
                     },
+                    "fault": {
+                      "type": "string",
+                      "enum": [
+                        "unset",
+                        "supplier",
+                        "ipago"
+                      ],
+                      "description": "iPago's finding on who caused the dispute. The supplier pays the dispute fee only for supplier."
+                    },
                     "created": {
                       "type": "string"
                     },
@@ -7827,6 +7862,7 @@
                     "evidence_submitted_at",
                     "evidence_text",
                     "evidence_submitted_by",
+                    "fault",
                     "created",
                     "closed_at"
                   ],
@@ -12122,6 +12158,11 @@
                             "nullable": true,
                             "type": "string"
                           },
+                          "withdrawal_waiver_at": {
+                            "nullable": true,
+                            "description": "When the buyer agreed to immediate delivery and to losing the 14-day right of withdrawal. Null when no consent was recorded.",
+                            "type": "string"
+                          },
                           "refunded_at": {
                             "nullable": true,
                             "type": "string"
@@ -12153,6 +12194,7 @@
                           "card_last4",
                           "payment_evidence",
                           "decline_reason",
+                          "withdrawal_waiver_at",
                           "created",
                           "paid_at"
                         ],
@@ -12684,6 +12726,11 @@
                       "nullable": true,
                       "type": "string"
                     },
+                    "withdrawal_waiver_at": {
+                      "nullable": true,
+                      "description": "When the buyer agreed to immediate delivery and to losing the 14-day right of withdrawal. Null when no consent was recorded.",
+                      "type": "string"
+                    },
                     "refunded_at": {
                       "nullable": true,
                       "type": "string"
@@ -12843,6 +12890,7 @@
                     "card_last4",
                     "payment_evidence",
                     "decline_reason",
+                    "withdrawal_waiver_at",
                     "created",
                     "paid_at",
                     "amount_refunded",
@@ -16911,6 +16959,27 @@
                       "minimum": -9007199254740991,
                       "maximum": 9007199254740991
                     },
+                    "card_cost": {
+                      "description": "The payment cost taken from what the supplier receives, per payment: bps of the amount the player paid (VAT included) plus a flat amount in minor units. Only on GET /v1/stores/{storeId}.",
+                      "type": "object",
+                      "properties": {
+                        "bps": {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        },
+                        "flat": {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        }
+                      },
+                      "required": [
+                        "bps",
+                        "flat"
+                      ],
+                      "additionalProperties": false
+                    },
                     "enabled_payment_methods": {
                       "nullable": true,
                       "type": "array",
@@ -17220,6 +17289,27 @@
                       "type": "integer",
                       "minimum": -9007199254740991,
                       "maximum": 9007199254740991
+                    },
+                    "card_cost": {
+                      "description": "The payment cost taken from what the supplier receives, per payment: bps of the amount the player paid (VAT included) plus a flat amount in minor units. Only on GET /v1/stores/{storeId}.",
+                      "type": "object",
+                      "properties": {
+                        "bps": {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        },
+                        "flat": {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        }
+                      },
+                      "required": [
+                        "bps",
+                        "flat"
+                      ],
+                      "additionalProperties": false
                     },
                     "enabled_payment_methods": {
                       "nullable": true,
@@ -17588,6 +17678,27 @@
                       "type": "integer",
                       "minimum": -9007199254740991,
                       "maximum": 9007199254740991
+                    },
+                    "card_cost": {
+                      "description": "The payment cost taken from what the supplier receives, per payment: bps of the amount the player paid (VAT included) plus a flat amount in minor units. Only on GET /v1/stores/{storeId}.",
+                      "type": "object",
+                      "properties": {
+                        "bps": {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        },
+                        "flat": {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        }
+                      },
+                      "required": [
+                        "bps",
+                        "flat"
+                      ],
+                      "additionalProperties": false
                     },
                     "enabled_payment_methods": {
                       "nullable": true,
@@ -18168,6 +18279,27 @@
                       "type": "integer",
                       "minimum": -9007199254740991,
                       "maximum": 9007199254740991
+                    },
+                    "card_cost": {
+                      "description": "The payment cost taken from what the supplier receives, per payment: bps of the amount the player paid (VAT included) plus a flat amount in minor units. Only on GET /v1/stores/{storeId}.",
+                      "type": "object",
+                      "properties": {
+                        "bps": {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        },
+                        "flat": {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        }
+                      },
+                      "required": [
+                        "bps",
+                        "flat"
+                      ],
+                      "additionalProperties": false
                     },
                     "enabled_payment_methods": {
                       "nullable": true,
@@ -19080,6 +19212,27 @@
                       "minimum": -9007199254740991,
                       "maximum": 9007199254740991
                     },
+                    "card_cost": {
+                      "description": "The payment cost taken from what the supplier receives, per payment: bps of the amount the player paid (VAT included) plus a flat amount in minor units. Only on GET /v1/stores/{storeId}.",
+                      "type": "object",
+                      "properties": {
+                        "bps": {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        },
+                        "flat": {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        }
+                      },
+                      "required": [
+                        "bps",
+                        "flat"
+                      ],
+                      "additionalProperties": false
+                    },
                     "enabled_payment_methods": {
                       "nullable": true,
                       "type": "array",
@@ -19485,6 +19638,27 @@
                             "minimum": -9007199254740991,
                             "maximum": 9007199254740991
                           },
+                          "card_cost": {
+                            "description": "The payment cost taken from what the supplier receives, per payment: bps of the amount the player paid (VAT included) plus a flat amount in minor units. Only on GET /v1/stores/{storeId}.",
+                            "type": "object",
+                            "properties": {
+                              "bps": {
+                                "type": "integer",
+                                "minimum": -9007199254740991,
+                                "maximum": 9007199254740991
+                              },
+                              "flat": {
+                                "type": "integer",
+                                "minimum": -9007199254740991,
+                                "maximum": 9007199254740991
+                              }
+                            },
+                            "required": [
+                              "bps",
+                              "flat"
+                            ],
+                            "additionalProperties": false
+                          },
                           "enabled_payment_methods": {
                             "nullable": true,
                             "type": "array",
@@ -19711,6 +19885,27 @@
                       "type": "integer",
                       "minimum": -9007199254740991,
                       "maximum": 9007199254740991
+                    },
+                    "card_cost": {
+                      "description": "The payment cost taken from what the supplier receives, per payment: bps of the amount the player paid (VAT included) plus a flat amount in minor units. Only on GET /v1/stores/{storeId}.",
+                      "type": "object",
+                      "properties": {
+                        "bps": {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        },
+                        "flat": {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        }
+                      },
+                      "required": [
+                        "bps",
+                        "flat"
+                      ],
+                      "additionalProperties": false
                     },
                     "enabled_payment_methods": {
                       "nullable": true,
@@ -20241,6 +20436,27 @@
                       "minimum": -9007199254740991,
                       "maximum": 9007199254740991
                     },
+                    "card_cost": {
+                      "description": "The payment cost taken from what the supplier receives, per payment: bps of the amount the player paid (VAT included) plus a flat amount in minor units. Only on GET /v1/stores/{storeId}.",
+                      "type": "object",
+                      "properties": {
+                        "bps": {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        },
+                        "flat": {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        }
+                      },
+                      "required": [
+                        "bps",
+                        "flat"
+                      ],
+                      "additionalProperties": false
+                    },
                     "enabled_payment_methods": {
                       "nullable": true,
                       "type": "array",
@@ -20422,6 +20638,378 @@
         }
       }
     },
+    "/v1/admin/stores/{storeId}/margin": {
+      "patch": {
+        "operationId": "updateAdminStoreMargin",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "platform_fee_bps": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 10000
+                  },
+                  "reason": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 1000
+                  }
+                },
+                "required": [
+                  "platform_fee_bps",
+                  "reason"
+                ]
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "storeId",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "object": {
+                      "type": "string",
+                      "enum": [
+                        "store"
+                      ]
+                    },
+                    "id": {
+                      "type": "string"
+                    },
+                    "account": {
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "currency": {
+                      "type": "string"
+                    },
+                    "slug": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "display_name": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "description": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "accent_color": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "logo_url": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "theme": {
+                      "type": "string"
+                    },
+                    "appearance": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "draft",
+                        "pending_review",
+                        "live",
+                        "suspended"
+                      ]
+                    },
+                    "rejection_reason": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "suspended_reason": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "requires_username": {
+                      "type": "boolean"
+                    },
+                    "username_label": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "tax_behavior": {
+                      "type": "string",
+                      "enum": [
+                        "inclusive",
+                        "exclusive"
+                      ]
+                    },
+                    "platform_fee_bps": {
+                      "type": "integer",
+                      "minimum": -9007199254740991,
+                      "maximum": 9007199254740991
+                    },
+                    "card_cost": {
+                      "description": "The payment cost taken from what the supplier receives, per payment: bps of the amount the player paid (VAT included) plus a flat amount in minor units. Only on GET /v1/stores/{storeId}.",
+                      "type": "object",
+                      "properties": {
+                        "bps": {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        },
+                        "flat": {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        }
+                      },
+                      "required": [
+                        "bps",
+                        "flat"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "enabled_payment_methods": {
+                      "nullable": true,
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "business_name": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "support_email": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "created": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "object",
+                    "id",
+                    "account",
+                    "name",
+                    "currency",
+                    "slug",
+                    "display_name",
+                    "description",
+                    "accent_color",
+                    "logo_url",
+                    "theme",
+                    "appearance",
+                    "status",
+                    "rejection_reason",
+                    "suspended_reason",
+                    "requires_username",
+                    "username_label",
+                    "tax_behavior",
+                    "platform_fee_bps",
+                    "enabled_payment_methods",
+                    "business_name",
+                    "support_email",
+                    "created"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string"
+                        },
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "param": {
+                          "type": "string"
+                        },
+                        "request_id": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "type",
+                        "code",
+                        "message",
+                        "request_id"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string"
+                        },
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "param": {
+                          "type": "string"
+                        },
+                        "request_id": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "type",
+                        "code",
+                        "message",
+                        "request_id"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string"
+                        },
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "param": {
+                          "type": "string"
+                        },
+                        "request_id": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "type",
+                        "code",
+                        "message",
+                        "request_id"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string"
+                        },
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "param": {
+                          "type": "string"
+                        },
+                        "request_id": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "type",
+                        "code",
+                        "message",
+                        "request_id"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v1/admin/stores/{storeId}/reject": {
       "post": {
         "operationId": "rejectAdminStore",
@@ -20542,6 +21130,27 @@
                       "type": "integer",
                       "minimum": -9007199254740991,
                       "maximum": 9007199254740991
+                    },
+                    "card_cost": {
+                      "description": "The payment cost taken from what the supplier receives, per payment: bps of the amount the player paid (VAT included) plus a flat amount in minor units. Only on GET /v1/stores/{storeId}.",
+                      "type": "object",
+                      "properties": {
+                        "bps": {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        },
+                        "flat": {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        }
+                      },
+                      "required": [
+                        "bps",
+                        "flat"
+                      ],
+                      "additionalProperties": false
                     },
                     "enabled_payment_methods": {
                       "nullable": true,
@@ -20844,6 +21453,27 @@
                       "type": "integer",
                       "minimum": -9007199254740991,
                       "maximum": 9007199254740991
+                    },
+                    "card_cost": {
+                      "description": "The payment cost taken from what the supplier receives, per payment: bps of the amount the player paid (VAT included) plus a flat amount in minor units. Only on GET /v1/stores/{storeId}.",
+                      "type": "object",
+                      "properties": {
+                        "bps": {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        },
+                        "flat": {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        }
+                      },
+                      "required": [
+                        "bps",
+                        "flat"
+                      ],
+                      "additionalProperties": false
                     },
                     "enabled_payment_methods": {
                       "nullable": true,
@@ -21169,6 +21799,27 @@
                       "type": "integer",
                       "minimum": -9007199254740991,
                       "maximum": 9007199254740991
+                    },
+                    "card_cost": {
+                      "description": "The payment cost taken from what the supplier receives, per payment: bps of the amount the player paid (VAT included) plus a flat amount in minor units. Only on GET /v1/stores/{storeId}.",
+                      "type": "object",
+                      "properties": {
+                        "bps": {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        },
+                        "flat": {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        }
+                      },
+                      "required": [
+                        "bps",
+                        "flat"
+                      ],
+                      "additionalProperties": false
                     },
                     "enabled_payment_methods": {
                       "nullable": true,
@@ -22756,6 +23407,11 @@
                             "nullable": true,
                             "type": "string"
                           },
+                          "withdrawal_waiver_at": {
+                            "nullable": true,
+                            "description": "When the buyer agreed to immediate delivery and to losing the 14-day right of withdrawal. Null when no consent was recorded.",
+                            "type": "string"
+                          },
                           "refunded_at": {
                             "nullable": true,
                             "type": "string"
@@ -22806,6 +23462,7 @@
                           "card_last4",
                           "payment_evidence",
                           "decline_reason",
+                          "withdrawal_waiver_at",
                           "created",
                           "paid_at",
                           "amount_refunded"
@@ -23578,6 +24235,15 @@
                               "admin"
                             ]
                           },
+                          "fault": {
+                            "type": "string",
+                            "enum": [
+                              "unset",
+                              "supplier",
+                              "ipago"
+                            ],
+                            "description": "iPago's finding on who caused the dispute. The supplier pays the dispute fee only for supplier."
+                          },
                           "created": {
                             "type": "string"
                           },
@@ -23598,6 +24264,7 @@
                           "evidence_submitted_at",
                           "evidence_text",
                           "evidence_submitted_by",
+                          "fault",
                           "created",
                           "closed_at"
                         ],
@@ -25004,6 +25671,79 @@
                         ],
                         "additionalProperties": false
                       }
+                    },
+                    "tax_profile": {
+                      "nullable": true,
+                      "type": "object",
+                      "properties": {
+                        "object": {
+                          "type": "string",
+                          "enum": [
+                            "tax_profile"
+                          ]
+                        },
+                        "vat_status": {
+                          "nullable": true,
+                          "type": "string",
+                          "enum": [
+                            "pl_vat",
+                            "eu_vat",
+                            "non_eu",
+                            "not_registered"
+                          ]
+                        },
+                        "vat_id": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "establishment_country": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "updated": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "self_billing_agreed_at": {
+                          "nullable": true,
+                          "description": "Set by iPago staff when the signed self-billing agreement is on file.",
+                          "type": "string"
+                        },
+                        "self_billing_agreement_version": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "ksef_permission_at": {
+                          "nullable": true,
+                          "description": "Set by iPago staff when the supplier's KSeF self-billing grant is on file. Polish VAT payers only.",
+                          "type": "string"
+                        },
+                        "invoice_blockers": {
+                          "type": "array",
+                          "items": {
+                            "type": "string",
+                            "enum": [
+                              "tax_profile_missing",
+                              "not_vat_registered",
+                              "agreement_missing",
+                              "ksef_permission_missing"
+                            ]
+                          },
+                          "description": "Why no weekly self-billing invoice can be issued yet. Empty when nothing is missing."
+                        }
+                      },
+                      "required": [
+                        "object",
+                        "vat_status",
+                        "vat_id",
+                        "establishment_country",
+                        "updated",
+                        "self_billing_agreed_at",
+                        "self_billing_agreement_version",
+                        "ksef_permission_at",
+                        "invoice_blockers"
+                      ],
+                      "additionalProperties": false
                     }
                   },
                   "required": [
@@ -25015,7 +25755,8 @@
                     "verification_status",
                     "stores",
                     "members",
-                    "exposure"
+                    "exposure",
+                    "tax_profile"
                   ],
                   "additionalProperties": false
                 }
@@ -25023,6 +25764,316 @@
             }
           },
           "401": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string"
+                        },
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "param": {
+                          "type": "string"
+                        },
+                        "request_id": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "type",
+                        "code",
+                        "message",
+                        "request_id"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string"
+                        },
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "param": {
+                          "type": "string"
+                        },
+                        "request_id": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "type",
+                        "code",
+                        "message",
+                        "request_id"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/admin/accounts/{accountId}/invoicing": {
+      "patch": {
+        "operationId": "updateAdminAccountInvoicing",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "self_billing_agreement": {
+                    "nullable": true,
+                    "type": "object",
+                    "properties": {
+                      "version": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 64
+                      },
+                      "signed_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+                      }
+                    },
+                    "required": [
+                      "version",
+                      "signed_at"
+                    ]
+                  },
+                  "ksef_permission_at": {
+                    "nullable": true,
+                    "type": "string",
+                    "format": "date-time",
+                    "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+                  },
+                  "reason": {
+                    "type": "string",
+                    "maxLength": 1000
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "accountId",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "object": {
+                      "type": "string",
+                      "enum": [
+                        "tax_profile"
+                      ]
+                    },
+                    "vat_status": {
+                      "nullable": true,
+                      "type": "string",
+                      "enum": [
+                        "pl_vat",
+                        "eu_vat",
+                        "non_eu",
+                        "not_registered"
+                      ]
+                    },
+                    "vat_id": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "establishment_country": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "updated": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "self_billing_agreed_at": {
+                      "nullable": true,
+                      "description": "Set by iPago staff when the signed self-billing agreement is on file.",
+                      "type": "string"
+                    },
+                    "self_billing_agreement_version": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "ksef_permission_at": {
+                      "nullable": true,
+                      "description": "Set by iPago staff when the supplier's KSeF self-billing grant is on file. Polish VAT payers only.",
+                      "type": "string"
+                    },
+                    "invoice_blockers": {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "enum": [
+                          "tax_profile_missing",
+                          "not_vat_registered",
+                          "agreement_missing",
+                          "ksef_permission_missing"
+                        ]
+                      },
+                      "description": "Why no weekly self-billing invoice can be issued yet. Empty when nothing is missing."
+                    }
+                  },
+                  "required": [
+                    "object",
+                    "vat_status",
+                    "vat_id",
+                    "establishment_country",
+                    "updated",
+                    "self_billing_agreed_at",
+                    "self_billing_agreement_version",
+                    "ksef_permission_at",
+                    "invoice_blockers"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string"
+                        },
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "param": {
+                          "type": "string"
+                        },
+                        "request_id": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "type",
+                        "code",
+                        "message",
+                        "request_id"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string"
+                        },
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "param": {
+                          "type": "string"
+                        },
+                        "request_id": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "type",
+                        "code",
+                        "message",
+                        "request_id"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "403": {
             "description": "Default Response",
             "content": {
               "application/json": {
@@ -25901,6 +26952,15 @@
                               "admin"
                             ]
                           },
+                          "fault": {
+                            "type": "string",
+                            "enum": [
+                              "unset",
+                              "supplier",
+                              "ipago"
+                            ],
+                            "description": "iPago's finding on who caused the dispute. The supplier pays the dispute fee only for supplier."
+                          },
                           "created": {
                             "type": "string"
                           },
@@ -25921,6 +26981,7 @@
                           "evidence_submitted_at",
                           "evidence_text",
                           "evidence_submitted_by",
+                          "fault",
                           "created",
                           "closed_at"
                         ],
@@ -26119,6 +27180,15 @@
                         "admin"
                       ]
                     },
+                    "fault": {
+                      "type": "string",
+                      "enum": [
+                        "unset",
+                        "supplier",
+                        "ipago"
+                      ],
+                      "description": "iPago's finding on who caused the dispute. The supplier pays the dispute fee only for supplier."
+                    },
                     "created": {
                       "type": "string"
                     },
@@ -26139,6 +27209,7 @@
                     "evidence_submitted_at",
                     "evidence_text",
                     "evidence_submitted_by",
+                    "fault",
                     "created",
                     "closed_at"
                   ],
@@ -26332,6 +27403,15 @@
                         "admin"
                       ]
                     },
+                    "fault": {
+                      "type": "string",
+                      "enum": [
+                        "unset",
+                        "supplier",
+                        "ipago"
+                      ],
+                      "description": "iPago's finding on who caused the dispute. The supplier pays the dispute fee only for supplier."
+                    },
                     "created": {
                       "type": "string"
                     },
@@ -26352,6 +27432,7 @@
                     "evidence_submitted_at",
                     "evidence_text",
                     "evidence_submitted_by",
+                    "fault",
                     "created",
                     "closed_at"
                   ],
@@ -26621,6 +27702,315 @@
         }
       }
     },
+    "/v1/admin/disputes/{disputeId}/fault": {
+      "post": {
+        "operationId": "setAdminDisputeFault",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "fault": {
+                    "type": "string",
+                    "enum": [
+                      "supplier",
+                      "ipago"
+                    ]
+                  },
+                  "reason": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 1000
+                  }
+                },
+                "required": [
+                  "fault",
+                  "reason"
+                ]
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "disputeId",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "object": {
+                      "type": "string",
+                      "enum": [
+                        "dispute"
+                      ]
+                    },
+                    "id": {
+                      "type": "string"
+                    },
+                    "order": {
+                      "type": "string"
+                    },
+                    "amount": {
+                      "type": "integer",
+                      "minimum": -9007199254740991,
+                      "maximum": 9007199254740991
+                    },
+                    "currency": {
+                      "type": "string"
+                    },
+                    "reason": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "string"
+                    },
+                    "evidence_due_by": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "evidence_submitted_at": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "evidence_text": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "evidence_submitted_by": {
+                      "nullable": true,
+                      "type": "string",
+                      "enum": [
+                        "merchant",
+                        "admin"
+                      ]
+                    },
+                    "fault": {
+                      "type": "string",
+                      "enum": [
+                        "unset",
+                        "supplier",
+                        "ipago"
+                      ],
+                      "description": "iPago's finding on who caused the dispute. The supplier pays the dispute fee only for supplier."
+                    },
+                    "created": {
+                      "type": "string"
+                    },
+                    "closed_at": {
+                      "nullable": true,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "object",
+                    "id",
+                    "order",
+                    "amount",
+                    "currency",
+                    "reason",
+                    "status",
+                    "evidence_due_by",
+                    "evidence_submitted_at",
+                    "evidence_text",
+                    "evidence_submitted_by",
+                    "fault",
+                    "created",
+                    "closed_at"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string"
+                        },
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "param": {
+                          "type": "string"
+                        },
+                        "request_id": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "type",
+                        "code",
+                        "message",
+                        "request_id"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string"
+                        },
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "param": {
+                          "type": "string"
+                        },
+                        "request_id": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "type",
+                        "code",
+                        "message",
+                        "request_id"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string"
+                        },
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "param": {
+                          "type": "string"
+                        },
+                        "request_id": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "type",
+                        "code",
+                        "message",
+                        "request_id"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string"
+                        },
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "param": {
+                          "type": "string"
+                        },
+                        "request_id": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "type",
+                        "code",
+                        "message",
+                        "request_id"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v1/admin/disputes/{disputeId}/evidence": {
       "post": {
         "operationId": "submitAdminDisputeEvidence",
@@ -26709,6 +28099,15 @@
                         "admin"
                       ]
                     },
+                    "fault": {
+                      "type": "string",
+                      "enum": [
+                        "unset",
+                        "supplier",
+                        "ipago"
+                      ],
+                      "description": "iPago's finding on who caused the dispute. The supplier pays the dispute fee only for supplier."
+                    },
                     "created": {
                       "type": "string"
                     },
@@ -26729,6 +28128,7 @@
                     "evidence_submitted_at",
                     "evidence_text",
                     "evidence_submitted_by",
+                    "fault",
                     "created",
                     "closed_at"
                   ],
@@ -33993,6 +35393,27 @@
                       "minimum": -9007199254740991,
                       "maximum": 9007199254740991
                     },
+                    "card_cost": {
+                      "description": "The payment cost taken from what the supplier receives, per payment: bps of the amount the player paid (VAT included) plus a flat amount in minor units. Only on GET /v1/stores/{storeId}.",
+                      "type": "object",
+                      "properties": {
+                        "bps": {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        },
+                        "flat": {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        }
+                      },
+                      "required": [
+                        "bps",
+                        "flat"
+                      ],
+                      "additionalProperties": false
+                    },
                     "enabled_payment_methods": {
                       "nullable": true,
                       "type": "array",
@@ -40773,6 +42194,313 @@
         }
       }
     },
+    "/v1/storefront/subscriptions/manage": {
+      "get": {
+        "operationId": "getStorefrontManagedSubscription",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512
+            },
+            "in": "query",
+            "name": "token",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "object": {
+                      "type": "string",
+                      "enum": [
+                        "storefront_subscription"
+                      ]
+                    },
+                    "id": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "string"
+                    },
+                    "product_name": {
+                      "type": "string"
+                    },
+                    "unit_amount": {
+                      "type": "integer",
+                      "minimum": -9007199254740991,
+                      "maximum": 9007199254740991
+                    },
+                    "currency": {
+                      "type": "string"
+                    },
+                    "billing_interval": {
+                      "type": "string"
+                    },
+                    "delivery_target": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "current_period_end": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "store_name": {
+                      "type": "string"
+                    },
+                    "cancels_at_period_end": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "object",
+                    "id",
+                    "status",
+                    "product_name",
+                    "unit_amount",
+                    "currency",
+                    "billing_interval",
+                    "delivery_target",
+                    "current_period_end",
+                    "store_name",
+                    "cancels_at_period_end"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string"
+                        },
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "param": {
+                          "type": "string"
+                        },
+                        "request_id": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "type",
+                        "code",
+                        "message",
+                        "request_id"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/storefront/subscriptions/cancel": {
+      "post": {
+        "operationId": "cancelStorefrontManagedSubscription",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "token": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 512
+                  }
+                },
+                "required": [
+                  "token"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "object": {
+                      "type": "string",
+                      "enum": [
+                        "storefront_subscription"
+                      ]
+                    },
+                    "id": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "string"
+                    },
+                    "product_name": {
+                      "type": "string"
+                    },
+                    "unit_amount": {
+                      "type": "integer",
+                      "minimum": -9007199254740991,
+                      "maximum": 9007199254740991
+                    },
+                    "currency": {
+                      "type": "string"
+                    },
+                    "billing_interval": {
+                      "type": "string"
+                    },
+                    "delivery_target": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "current_period_end": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "store_name": {
+                      "type": "string"
+                    },
+                    "cancels_at_period_end": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "object",
+                    "id",
+                    "status",
+                    "product_name",
+                    "unit_amount",
+                    "currency",
+                    "billing_interval",
+                    "delivery_target",
+                    "current_period_end",
+                    "store_name",
+                    "cancels_at_period_end"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string"
+                        },
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "param": {
+                          "type": "string"
+                        },
+                        "request_id": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "type",
+                        "code",
+                        "message",
+                        "request_id"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string"
+                        },
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "param": {
+                          "type": "string"
+                        },
+                        "request_id": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "type",
+                        "code",
+                        "message",
+                        "request_id"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v1/storefront/{slug}/baskets": {
       "post": {
         "operationId": "createBasket",
@@ -43598,6 +45326,10 @@
                     "type": "string",
                     "minLength": 2,
                     "maxLength": 2
+                  },
+                  "withdrawal_waiver": {
+                    "description": "True once the buyer has ticked that they want delivery to start right away and that they lose the 14-day right of withdrawal once it has. Required on storefront checkouts.",
+                    "type": "boolean"
                   }
                 }
               }
@@ -43941,6 +45673,10 @@
                     "type": "string",
                     "minLength": 2,
                     "maxLength": 2
+                  },
+                  "withdrawal_waiver": {
+                    "description": "True once the buyer has ticked that they want delivery to start right away and that they lose the 14-day right of withdrawal once it has. Required on storefront checkouts.",
+                    "type": "boolean"
                   }
                 },
                 "required": [
@@ -47761,6 +49497,587 @@
         }
       }
     },
+    "/v1/admin/stores/{storeId}/subscriptions": {
+      "get": {
+        "operationId": "listAdminStoreSubscriptions",
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100
+            },
+            "in": "query",
+            "name": "limit",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "starting_after",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "ending_before",
+            "required": false
+          },
+          {
+            "schema": {
+              "default": "live",
+              "type": "string",
+              "enum": [
+                "live",
+                "test"
+              ]
+            },
+            "in": "query",
+            "name": "mode",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "storeId",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "object": {
+                      "type": "string",
+                      "enum": [
+                        "list"
+                      ]
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "object": {
+                            "type": "string",
+                            "enum": [
+                              "subscription"
+                            ]
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "product": {
+                            "type": "string"
+                          },
+                          "product_name": {
+                            "type": "string"
+                          },
+                          "quantity": {
+                            "type": "integer",
+                            "minimum": -9007199254740991,
+                            "maximum": 9007199254740991
+                          },
+                          "unit_amount": {
+                            "type": "integer",
+                            "minimum": -9007199254740991,
+                            "maximum": 9007199254740991
+                          },
+                          "currency": {
+                            "type": "string"
+                          },
+                          "billing_interval": {
+                            "type": "string",
+                            "enum": [
+                              "month",
+                              "year"
+                            ]
+                          },
+                          "customer_email": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "delivery_target": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "status": {
+                            "type": "string",
+                            "enum": [
+                              "active",
+                              "past_due",
+                              "canceled"
+                            ]
+                          },
+                          "current_period_end": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "created": {
+                            "type": "string"
+                          },
+                          "canceled_at": {
+                            "nullable": true,
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "object",
+                          "id",
+                          "product",
+                          "product_name",
+                          "quantity",
+                          "unit_amount",
+                          "currency",
+                          "billing_interval",
+                          "customer_email",
+                          "delivery_target",
+                          "status",
+                          "current_period_end",
+                          "created",
+                          "canceled_at"
+                        ],
+                        "additionalProperties": false
+                      }
+                    },
+                    "has_more": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "object",
+                    "data",
+                    "has_more"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string"
+                        },
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "param": {
+                          "type": "string"
+                        },
+                        "request_id": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "type",
+                        "code",
+                        "message",
+                        "request_id"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/admin/stores/{storeId}/subscriptions/{id}/cancel": {
+      "post": {
+        "operationId": "cancelAdminStoreSubscription",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "reason": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 1000
+                  },
+                  "immediately": {
+                    "default": false,
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "reason"
+                ]
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "default": "live",
+              "type": "string",
+              "enum": [
+                "live",
+                "test"
+              ]
+            },
+            "in": "query",
+            "name": "mode",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "storeId",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "object": {
+                      "type": "string",
+                      "enum": [
+                        "subscription"
+                      ]
+                    },
+                    "id": {
+                      "type": "string"
+                    },
+                    "product": {
+                      "type": "string"
+                    },
+                    "product_name": {
+                      "type": "string"
+                    },
+                    "quantity": {
+                      "type": "integer",
+                      "minimum": -9007199254740991,
+                      "maximum": 9007199254740991
+                    },
+                    "unit_amount": {
+                      "type": "integer",
+                      "minimum": -9007199254740991,
+                      "maximum": 9007199254740991
+                    },
+                    "currency": {
+                      "type": "string"
+                    },
+                    "billing_interval": {
+                      "type": "string",
+                      "enum": [
+                        "month",
+                        "year"
+                      ]
+                    },
+                    "customer_email": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "delivery_target": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "active",
+                        "past_due",
+                        "canceled"
+                      ]
+                    },
+                    "current_period_end": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "created": {
+                      "type": "string"
+                    },
+                    "canceled_at": {
+                      "nullable": true,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "object",
+                    "id",
+                    "product",
+                    "product_name",
+                    "quantity",
+                    "unit_amount",
+                    "currency",
+                    "billing_interval",
+                    "customer_email",
+                    "delivery_target",
+                    "status",
+                    "current_period_end",
+                    "created",
+                    "canceled_at"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string"
+                        },
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "param": {
+                          "type": "string"
+                        },
+                        "request_id": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "type",
+                        "code",
+                        "message",
+                        "request_id"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string"
+                        },
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "param": {
+                          "type": "string"
+                        },
+                        "request_id": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "type",
+                        "code",
+                        "message",
+                        "request_id"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string"
+                        },
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "param": {
+                          "type": "string"
+                        },
+                        "request_id": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "type",
+                        "code",
+                        "message",
+                        "request_id"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string"
+                        },
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "param": {
+                          "type": "string"
+                        },
+                        "request_id": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "type",
+                        "code",
+                        "message",
+                        "request_id"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string"
+                        },
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "param": {
+                          "type": "string"
+                        },
+                        "request_id": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "type",
+                        "code",
+                        "message",
+                        "request_id"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v1/accounts/{accountId}/verification": {
       "get": {
         "operationId": "getAccountVerification",
@@ -50557,6 +52874,11 @@
                       "nullable": true,
                       "type": "string"
                     },
+                    "withdrawal_waiver_at": {
+                      "nullable": true,
+                      "description": "When the buyer agreed to immediate delivery and to losing the 14-day right of withdrawal. Null when no consent was recorded.",
+                      "type": "string"
+                    },
                     "refunded_at": {
                       "nullable": true,
                       "type": "string"
@@ -50567,6 +52889,51 @@
                     "paid_at": {
                       "nullable": true,
                       "type": "string"
+                    },
+                    "mode": {
+                      "type": "string",
+                      "enum": [
+                        "live",
+                        "test"
+                      ]
+                    },
+                    "receipt_url": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "disputes": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "status": {
+                            "type": "string"
+                          },
+                          "reason": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "evidence_due_by": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "evidence_submitted_at": {
+                            "nullable": true,
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "status",
+                          "reason",
+                          "evidence_due_by",
+                          "evidence_submitted_at"
+                        ],
+                        "additionalProperties": false
+                      }
                     },
                     "store": {
                       "type": "object",
@@ -50664,8 +53031,12 @@
                     "card_last4",
                     "payment_evidence",
                     "decline_reason",
+                    "withdrawal_waiver_at",
                     "created",
                     "paid_at",
+                    "mode",
+                    "receipt_url",
+                    "disputes",
                     "store",
                     "timeline"
                   ],
@@ -50978,6 +53349,182 @@
                     "object",
                     "key",
                     "data"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string"
+                        },
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "param": {
+                          "type": "string"
+                        },
+                        "request_id": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "type",
+                        "code",
+                        "message",
+                        "request_id"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string"
+                        },
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "param": {
+                          "type": "string"
+                        },
+                        "request_id": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "type",
+                        "code",
+                        "message",
+                        "request_id"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/admin/webhook-deliveries/{deliveryId}/retry": {
+      "post": {
+        "operationId": "retryAdminWebhookDelivery",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "deliveryId",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "object": {
+                      "type": "string",
+                      "enum": [
+                        "webhook_delivery"
+                      ]
+                    },
+                    "id": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "object",
+                    "id",
+                    "status"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string"
+                        },
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "param": {
+                          "type": "string"
+                        },
+                        "request_id": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "type",
+                        "code",
+                        "message",
+                        "request_id"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "error"
                   ],
                   "additionalProperties": false
                 }

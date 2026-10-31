@@ -1405,6 +1405,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/admin/stores/{storeId}/margin": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["updateAdminStoreMargin"];
+        trace?: never;
+    };
     "/v1/admin/stores/{storeId}/reject": {
         parameters: {
             query?: never;
@@ -1645,6 +1661,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/admin/accounts/{accountId}/invoicing": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["updateAdminAccountInvoicing"];
+        trace?: never;
+    };
     "/v1/admin/admins": {
         parameters: {
             query?: never;
@@ -1719,6 +1751,22 @@ export interface paths {
         get?: never;
         put?: never;
         post: operations["submitStoreDisputeEvidence"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/disputes/{disputeId}/fault": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["setAdminDisputeFault"];
         delete?: never;
         options?: never;
         head?: never;
@@ -2301,6 +2349,38 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/storefront/subscriptions/manage": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getStorefrontManagedSubscription"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/storefront/subscriptions/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["cancelStorefrontManagedSubscription"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/storefront/{slug}/baskets": {
         parameters: {
             query?: never;
@@ -2525,6 +2605,38 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/admin/stores/{storeId}/subscriptions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["listAdminStoreSubscriptions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/stores/{storeId}/subscriptions/{id}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["cancelAdminStoreSubscription"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/accounts/{accountId}/verification": {
         parameters: {
             query?: never;
@@ -2727,6 +2839,22 @@ export interface paths {
         get: operations["listAdminQueueItems"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/webhook-deliveries/{deliveryId}/retry": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["retryAdminWebhookDelivery"];
         delete?: never;
         options?: never;
         head?: never;
@@ -3838,6 +3966,8 @@ export interface operations {
                     return_url?: string;
                     delivery_target?: string;
                     country?: string;
+                    /** @description Pass true once your checkout has asked the buyer to agree to immediate delivery and to losing the 14-day right of withdrawal. iPago records the time on the order. */
+                    withdrawal_waiver?: boolean;
                 };
             };
         };
@@ -4066,6 +4196,8 @@ export interface operations {
                                 three_d_secure: string | null;
                             } | null;
                             decline_reason: string | null;
+                            /** @description When the buyer agreed to immediate delivery and to losing the 14-day right of withdrawal. Null when no consent was recorded. */
+                            withdrawal_waiver_at: string | null;
                             refunded_at?: string | null;
                             created: string;
                             paid_at: string | null;
@@ -4205,6 +4337,8 @@ export interface operations {
                             three_d_secure: string | null;
                         } | null;
                         decline_reason: string | null;
+                        /** @description When the buyer agreed to immediate delivery and to losing the 14-day right of withdrawal. Null when no consent was recorded. */
+                        withdrawal_waiver_at: string | null;
                         refunded_at?: string | null;
                         created: string;
                         paid_at: string | null;
@@ -5700,6 +5834,11 @@ export interface operations {
                             evidence_text: string | null;
                             /** @enum {string|null} */
                             evidence_submitted_by: "merchant" | "admin" | null;
+                            /**
+                             * @description iPago's finding on who caused the dispute. The supplier pays the dispute fee only for supplier.
+                             * @enum {string}
+                             */
+                            fault: "unset" | "supplier" | "ipago";
                             created: string;
                             closed_at: string | null;
                         }[];
@@ -5774,6 +5913,11 @@ export interface operations {
                         evidence_text: string | null;
                         /** @enum {string|null} */
                         evidence_submitted_by: "merchant" | "admin" | null;
+                        /**
+                         * @description iPago's finding on who caused the dispute. The supplier pays the dispute fee only for supplier.
+                         * @enum {string}
+                         */
+                        fault: "unset" | "supplier" | "ipago";
                         created: string;
                         closed_at: string | null;
                     };
@@ -7569,6 +7713,8 @@ export interface operations {
                                 three_d_secure: string | null;
                             } | null;
                             decline_reason: string | null;
+                            /** @description When the buyer agreed to immediate delivery and to losing the 14-day right of withdrawal. Null when no consent was recorded. */
+                            withdrawal_waiver_at: string | null;
                             refunded_at?: string | null;
                             created: string;
                             paid_at: string | null;
@@ -7728,6 +7874,8 @@ export interface operations {
                             three_d_secure: string | null;
                         } | null;
                         decline_reason: string | null;
+                        /** @description When the buyer agreed to immediate delivery and to losing the 14-day right of withdrawal. Null when no consent was recorded. */
+                        withdrawal_waiver_at: string | null;
                         refunded_at?: string | null;
                         created: string;
                         paid_at: string | null;
@@ -9179,6 +9327,11 @@ export interface operations {
                         /** @enum {string} */
                         tax_behavior: "inclusive" | "exclusive";
                         platform_fee_bps: number;
+                        /** @description The payment cost taken from what the supplier receives, per payment: bps of the amount the player paid (VAT included) plus a flat amount in minor units. Only on GET /v1/stores/{storeId}. */
+                        card_cost?: {
+                            bps: number;
+                            flat: number;
+                        };
                         enabled_payment_methods: string[] | null;
                         business_name: string | null;
                         support_email: string | null;
@@ -9281,6 +9434,11 @@ export interface operations {
                         /** @enum {string} */
                         tax_behavior: "inclusive" | "exclusive";
                         platform_fee_bps: number;
+                        /** @description The payment cost taken from what the supplier receives, per payment: bps of the amount the player paid (VAT included) plus a flat amount in minor units. Only on GET /v1/stores/{storeId}. */
+                        card_cost?: {
+                            bps: number;
+                            flat: number;
+                        };
                         enabled_payment_methods: string[] | null;
                         business_name: string | null;
                         support_email: string | null;
@@ -9415,6 +9573,11 @@ export interface operations {
                         /** @enum {string} */
                         tax_behavior: "inclusive" | "exclusive";
                         platform_fee_bps: number;
+                        /** @description The payment cost taken from what the supplier receives, per payment: bps of the amount the player paid (VAT included) plus a flat amount in minor units. Only on GET /v1/stores/{storeId}. */
+                        card_cost?: {
+                            bps: number;
+                            flat: number;
+                        };
                         enabled_payment_methods: string[] | null;
                         business_name: string | null;
                         support_email: string | null;
@@ -9635,6 +9798,11 @@ export interface operations {
                         /** @enum {string} */
                         tax_behavior: "inclusive" | "exclusive";
                         platform_fee_bps: number;
+                        /** @description The payment cost taken from what the supplier receives, per payment: bps of the amount the player paid (VAT included) plus a flat amount in minor units. Only on GET /v1/stores/{storeId}. */
+                        card_cost?: {
+                            bps: number;
+                            flat: number;
+                        };
                         enabled_payment_methods: string[] | null;
                         business_name: string | null;
                         support_email: string | null;
@@ -9973,6 +10141,11 @@ export interface operations {
                         /** @enum {string} */
                         tax_behavior: "inclusive" | "exclusive";
                         platform_fee_bps: number;
+                        /** @description The payment cost taken from what the supplier receives, per payment: bps of the amount the player paid (VAT included) plus a flat amount in minor units. Only on GET /v1/stores/{storeId}. */
+                        card_cost?: {
+                            bps: number;
+                            flat: number;
+                        };
                         enabled_payment_methods: string[] | null;
                         business_name: string | null;
                         support_email: string | null;
@@ -10113,6 +10286,11 @@ export interface operations {
                             /** @enum {string} */
                             tax_behavior: "inclusive" | "exclusive";
                             platform_fee_bps: number;
+                            /** @description The payment cost taken from what the supplier receives, per payment: bps of the amount the player paid (VAT included) plus a flat amount in minor units. Only on GET /v1/stores/{storeId}. */
+                            card_cost?: {
+                                bps: number;
+                                flat: number;
+                            };
                             enabled_payment_methods: string[] | null;
                             business_name: string | null;
                             support_email: string | null;
@@ -10185,6 +10363,11 @@ export interface operations {
                         /** @enum {string} */
                         tax_behavior: "inclusive" | "exclusive";
                         platform_fee_bps: number;
+                        /** @description The payment cost taken from what the supplier receives, per payment: bps of the amount the player paid (VAT included) plus a flat amount in minor units. Only on GET /v1/stores/{storeId}. */
+                        card_cost?: {
+                            bps: number;
+                            flat: number;
+                        };
                         enabled_payment_methods: string[] | null;
                         business_name: string | null;
                         support_email: string | null;
@@ -10360,6 +10543,11 @@ export interface operations {
                         /** @enum {string} */
                         tax_behavior: "inclusive" | "exclusive";
                         platform_fee_bps: number;
+                        /** @description The payment cost taken from what the supplier receives, per payment: bps of the amount the player paid (VAT included) plus a flat amount in minor units. Only on GET /v1/stores/{storeId}. */
+                        card_cost?: {
+                            bps: number;
+                            flat: number;
+                        };
                         enabled_payment_methods: string[] | null;
                         business_name: string | null;
                         support_email: string | null;
@@ -10403,6 +10591,135 @@ export interface operations {
             };
             /** @description Default Response */
             409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    updateAdminStoreMargin: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                storeId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    platform_fee_bps: number;
+                    reason: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @enum {string} */
+                        object: "store";
+                        id: string;
+                        account: string;
+                        name: string;
+                        currency: string;
+                        slug: string | null;
+                        display_name: string | null;
+                        description: string | null;
+                        accent_color: string | null;
+                        logo_url: string | null;
+                        theme: string;
+                        appearance: string;
+                        /** @enum {string} */
+                        status: "draft" | "pending_review" | "live" | "suspended";
+                        rejection_reason: string | null;
+                        suspended_reason: string | null;
+                        requires_username: boolean;
+                        username_label: string | null;
+                        /** @enum {string} */
+                        tax_behavior: "inclusive" | "exclusive";
+                        platform_fee_bps: number;
+                        /** @description The payment cost taken from what the supplier receives, per payment: bps of the amount the player paid (VAT included) plus a flat amount in minor units. Only on GET /v1/stores/{storeId}. */
+                        card_cost?: {
+                            bps: number;
+                            flat: number;
+                        };
+                        enabled_payment_methods: string[] | null;
+                        business_name: string | null;
+                        support_email: string | null;
+                        created: string;
+                    };
+                };
+            };
+            /** @description Default Response */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+            /** @description Default Response */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+            /** @description Default Response */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+            /** @description Default Response */
+            404: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -10466,6 +10783,11 @@ export interface operations {
                         /** @enum {string} */
                         tax_behavior: "inclusive" | "exclusive";
                         platform_fee_bps: number;
+                        /** @description The payment cost taken from what the supplier receives, per payment: bps of the amount the player paid (VAT included) plus a flat amount in minor units. Only on GET /v1/stores/{storeId}. */
+                        card_cost?: {
+                            bps: number;
+                            flat: number;
+                        };
                         enabled_payment_methods: string[] | null;
                         business_name: string | null;
                         support_email: string | null;
@@ -10572,6 +10894,11 @@ export interface operations {
                         /** @enum {string} */
                         tax_behavior: "inclusive" | "exclusive";
                         platform_fee_bps: number;
+                        /** @description The payment cost taken from what the supplier receives, per payment: bps of the amount the player paid (VAT included) plus a flat amount in minor units. Only on GET /v1/stores/{storeId}. */
+                        card_cost?: {
+                            bps: number;
+                            flat: number;
+                        };
                         enabled_payment_methods: string[] | null;
                         business_name: string | null;
                         support_email: string | null;
@@ -10689,6 +11016,11 @@ export interface operations {
                         /** @enum {string} */
                         tax_behavior: "inclusive" | "exclusive";
                         platform_fee_bps: number;
+                        /** @description The payment cost taken from what the supplier receives, per payment: bps of the amount the player paid (VAT included) plus a flat amount in minor units. Only on GET /v1/stores/{storeId}. */
+                        card_cost?: {
+                            bps: number;
+                            flat: number;
+                        };
                         enabled_payment_methods: string[] | null;
                         business_name: string | null;
                         support_email: string | null;
@@ -11239,6 +11571,8 @@ export interface operations {
                                 three_d_secure: string | null;
                             } | null;
                             decline_reason: string | null;
+                            /** @description When the buyer agreed to immediate delivery and to losing the 14-day right of withdrawal. Null when no consent was recorded. */
+                            withdrawal_waiver_at: string | null;
                             refunded_at?: string | null;
                             created: string;
                             paid_at: string | null;
@@ -11525,6 +11859,11 @@ export interface operations {
                             evidence_text: string | null;
                             /** @enum {string|null} */
                             evidence_submitted_by: "merchant" | "admin" | null;
+                            /**
+                             * @description iPago's finding on who caused the dispute. The supplier pays the dispute fee only for supplier.
+                             * @enum {string}
+                             */
+                            fault: "unset" | "supplier" | "ipago";
                             created: string;
                             closed_at: string | null;
                         }[];
@@ -12045,11 +12384,145 @@ export interface operations {
                             currency: string;
                             owed: number;
                         }[];
+                        tax_profile: {
+                            /** @enum {string} */
+                            object: "tax_profile";
+                            /** @enum {string|null} */
+                            vat_status: "pl_vat" | "eu_vat" | "non_eu" | "not_registered" | null;
+                            vat_id: string | null;
+                            establishment_country: string | null;
+                            updated: string | null;
+                            /** @description Set by iPago staff when the signed self-billing agreement is on file. */
+                            self_billing_agreed_at: string | null;
+                            self_billing_agreement_version: string | null;
+                            /** @description Set by iPago staff when the supplier's KSeF self-billing grant is on file. Polish VAT payers only. */
+                            ksef_permission_at: string | null;
+                            /** @description Why no weekly self-billing invoice can be issued yet. Empty when nothing is missing. */
+                            invoice_blockers: ("tax_profile_missing" | "not_vat_registered" | "agreement_missing" | "ksef_permission_missing")[];
+                        } | null;
                     };
                 };
             };
             /** @description Default Response */
             401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+            /** @description Default Response */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    updateAdminAccountInvoicing: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                accountId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    self_billing_agreement?: {
+                        version: string;
+                        /** Format: date-time */
+                        signed_at: string;
+                    } | null;
+                    /** Format: date-time */
+                    ksef_permission_at?: string | null;
+                    reason?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @enum {string} */
+                        object: "tax_profile";
+                        /** @enum {string|null} */
+                        vat_status: "pl_vat" | "eu_vat" | "non_eu" | "not_registered" | null;
+                        vat_id: string | null;
+                        establishment_country: string | null;
+                        updated: string | null;
+                        /** @description Set by iPago staff when the signed self-billing agreement is on file. */
+                        self_billing_agreed_at: string | null;
+                        self_billing_agreement_version: string | null;
+                        /** @description Set by iPago staff when the supplier's KSeF self-billing grant is on file. Polish VAT payers only. */
+                        ksef_permission_at: string | null;
+                        /** @description Why no weekly self-billing invoice can be issued yet. Empty when nothing is missing. */
+                        invoice_blockers: ("tax_profile_missing" | "not_vat_registered" | "agreement_missing" | "ksef_permission_missing")[];
+                    };
+                };
+            };
+            /** @description Default Response */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+            /** @description Default Response */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+            /** @description Default Response */
+            403: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -12400,6 +12873,11 @@ export interface operations {
                             evidence_text: string | null;
                             /** @enum {string|null} */
                             evidence_submitted_by: "merchant" | "admin" | null;
+                            /**
+                             * @description iPago's finding on who caused the dispute. The supplier pays the dispute fee only for supplier.
+                             * @enum {string}
+                             */
+                            fault: "unset" | "supplier" | "ipago";
                             created: string;
                             closed_at: string | null;
                         }[];
@@ -12477,6 +12955,11 @@ export interface operations {
                         evidence_text: string | null;
                         /** @enum {string|null} */
                         evidence_submitted_by: "merchant" | "admin" | null;
+                        /**
+                         * @description iPago's finding on who caused the dispute. The supplier pays the dispute fee only for supplier.
+                         * @enum {string}
+                         */
+                        fault: "unset" | "supplier" | "ipago";
                         created: string;
                         closed_at: string | null;
                     };
@@ -12556,6 +13039,11 @@ export interface operations {
                         evidence_text: string | null;
                         /** @enum {string|null} */
                         evidence_submitted_by: "merchant" | "admin" | null;
+                        /**
+                         * @description iPago's finding on who caused the dispute. The supplier pays the dispute fee only for supplier.
+                         * @enum {string}
+                         */
+                        fault: "unset" | "supplier" | "ipago";
                         created: string;
                         closed_at: string | null;
                     };
@@ -12665,6 +13153,125 @@ export interface operations {
             };
         };
     };
+    setAdminDisputeFault: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                disputeId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @enum {string} */
+                    fault: "supplier" | "ipago";
+                    reason: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @enum {string} */
+                        object: "dispute";
+                        id: string;
+                        order: string;
+                        amount: number;
+                        currency: string;
+                        reason: string | null;
+                        status: string;
+                        evidence_due_by: string | null;
+                        evidence_submitted_at: string | null;
+                        evidence_text: string | null;
+                        /** @enum {string|null} */
+                        evidence_submitted_by: "merchant" | "admin" | null;
+                        /**
+                         * @description iPago's finding on who caused the dispute. The supplier pays the dispute fee only for supplier.
+                         * @enum {string}
+                         */
+                        fault: "unset" | "supplier" | "ipago";
+                        created: string;
+                        closed_at: string | null;
+                    };
+                };
+            };
+            /** @description Default Response */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+            /** @description Default Response */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+            /** @description Default Response */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+            /** @description Default Response */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
     submitAdminDisputeEvidence: {
         parameters: {
             query?: never;
@@ -12702,6 +13309,11 @@ export interface operations {
                         evidence_text: string | null;
                         /** @enum {string|null} */
                         evidence_submitted_by: "merchant" | "admin" | null;
+                        /**
+                         * @description iPago's finding on who caused the dispute. The supplier pays the dispute fee only for supplier.
+                         * @enum {string}
+                         */
+                        fault: "unset" | "supplier" | "ipago";
                         created: string;
                         closed_at: string | null;
                     };
@@ -15397,6 +16009,11 @@ export interface operations {
                         /** @enum {string} */
                         tax_behavior: "inclusive" | "exclusive";
                         platform_fee_bps: number;
+                        /** @description The payment cost taken from what the supplier receives, per payment: bps of the amount the player paid (VAT included) plus a flat amount in minor units. Only on GET /v1/stores/{storeId}. */
+                        card_cost?: {
+                            bps: number;
+                            flat: number;
+                        };
                         enabled_payment_methods: string[] | null;
                         business_name: string | null;
                         support_email: string | null;
@@ -17955,6 +18572,131 @@ export interface operations {
             };
         };
     };
+    getStorefrontManagedSubscription: {
+        parameters: {
+            query: {
+                token: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @enum {string} */
+                        object: "storefront_subscription";
+                        id: string;
+                        status: string;
+                        product_name: string;
+                        unit_amount: number;
+                        currency: string;
+                        billing_interval: string;
+                        delivery_target: string | null;
+                        current_period_end: string | null;
+                        store_name: string;
+                        cancels_at_period_end: boolean;
+                    };
+                };
+            };
+            /** @description Default Response */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    cancelStorefrontManagedSubscription: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    token: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @enum {string} */
+                        object: "storefront_subscription";
+                        id: string;
+                        status: string;
+                        product_name: string;
+                        unit_amount: number;
+                        currency: string;
+                        billing_interval: string;
+                        delivery_target: string | null;
+                        current_period_end: string | null;
+                        store_name: string;
+                        cancels_at_period_end: boolean;
+                    };
+                };
+            };
+            /** @description Default Response */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+            /** @description Default Response */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
     createBasket: {
         parameters: {
             query?: {
@@ -18848,6 +19590,8 @@ export interface operations {
                     method?: string;
                     /** @description Ignored for VAT: the country comes from the storefront server. */
                     country?: string;
+                    /** @description True once the buyer has ticked that they want delivery to start right away and that they lose the 14-day right of withdrawal once it has. Required on storefront checkouts. */
+                    withdrawal_waiver?: boolean;
                 };
             };
         };
@@ -18978,6 +19722,8 @@ export interface operations {
                     /** Format: email */
                     customer_email?: string;
                     country?: string;
+                    /** @description True once the buyer has ticked that they want delivery to start right away and that they lose the 14-day right of withdrawal once it has. Required on storefront checkouts. */
+                    withdrawal_waiver?: boolean;
                 };
             };
         };
@@ -20366,6 +21112,209 @@ export interface operations {
             };
         };
     };
+    listAdminStoreSubscriptions: {
+        parameters: {
+            query?: {
+                limit?: number;
+                starting_after?: string;
+                ending_before?: string;
+                mode?: "live" | "test";
+            };
+            header?: never;
+            path: {
+                storeId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @enum {string} */
+                        object: "list";
+                        data: {
+                            /** @enum {string} */
+                            object: "subscription";
+                            id: string;
+                            product: string;
+                            product_name: string;
+                            quantity: number;
+                            unit_amount: number;
+                            currency: string;
+                            /** @enum {string} */
+                            billing_interval: "month" | "year";
+                            customer_email: string | null;
+                            delivery_target: string | null;
+                            /** @enum {string} */
+                            status: "active" | "past_due" | "canceled";
+                            current_period_end: string | null;
+                            created: string;
+                            canceled_at: string | null;
+                        }[];
+                        has_more: boolean;
+                    };
+                };
+            };
+            /** @description Default Response */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    cancelAdminStoreSubscription: {
+        parameters: {
+            query?: {
+                mode?: "live" | "test";
+            };
+            header?: never;
+            path: {
+                storeId: string;
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    reason: string;
+                    /** @default false */
+                    immediately?: boolean;
+                };
+            };
+        };
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @enum {string} */
+                        object: "subscription";
+                        id: string;
+                        product: string;
+                        product_name: string;
+                        quantity: number;
+                        unit_amount: number;
+                        currency: string;
+                        /** @enum {string} */
+                        billing_interval: "month" | "year";
+                        customer_email: string | null;
+                        delivery_target: string | null;
+                        /** @enum {string} */
+                        status: "active" | "past_due" | "canceled";
+                        current_period_end: string | null;
+                        created: string;
+                        canceled_at: string | null;
+                    };
+                };
+            };
+            /** @description Default Response */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+            /** @description Default Response */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+            /** @description Default Response */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+            /** @description Default Response */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+            /** @description Default Response */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
     getAccountVerification: {
         parameters: {
             query?: never;
@@ -21420,9 +22369,21 @@ export interface operations {
                             three_d_secure: string | null;
                         } | null;
                         decline_reason: string | null;
+                        /** @description When the buyer agreed to immediate delivery and to losing the 14-day right of withdrawal. Null when no consent was recorded. */
+                        withdrawal_waiver_at: string | null;
                         refunded_at?: string | null;
                         created: string;
                         paid_at: string | null;
+                        /** @enum {string} */
+                        mode: "live" | "test";
+                        receipt_url: string | null;
+                        disputes: {
+                            id: string;
+                            status: string;
+                            reason: string | null;
+                            evidence_due_by: string | null;
+                            evidence_submitted_at: string | null;
+                        }[];
                         store: {
                             id: string;
                             name: string;
@@ -21560,6 +22521,84 @@ export interface operations {
                             order: string | null;
                             account: string | null;
                         }[];
+                    };
+                };
+            };
+            /** @description Default Response */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+            /** @description Default Response */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    retryAdminWebhookDelivery: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                deliveryId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @enum {string} */
+                        object: "webhook_delivery";
+                        id: string;
+                        status: string;
+                    };
+                };
+            };
+            /** @description Default Response */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
                     };
                 };
             };
