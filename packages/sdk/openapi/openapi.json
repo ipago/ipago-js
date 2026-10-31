@@ -2966,6 +2966,79 @@
                                     "currency"
                                   ],
                                   "additionalProperties": false
+                                },
+                                "purchase": {
+                                  "nullable": true,
+                                  "description": "What iPago buys this line from you at: your RRP minus iPago's margin, per unit and for the line. Null on lines sold before purchase prices were recorded.",
+                                  "type": "object",
+                                  "properties": {
+                                    "rrp_unit": {
+                                      "type": "object",
+                                      "properties": {
+                                        "amount": {
+                                          "type": "integer",
+                                          "minimum": -9007199254740991,
+                                          "maximum": 9007199254740991
+                                        },
+                                        "currency": {
+                                          "type": "string"
+                                        }
+                                      },
+                                      "required": [
+                                        "amount",
+                                        "currency"
+                                      ],
+                                      "additionalProperties": false
+                                    },
+                                    "margin_bps": {
+                                      "type": "integer",
+                                      "minimum": -9007199254740991,
+                                      "maximum": 9007199254740991
+                                    },
+                                    "unit": {
+                                      "type": "object",
+                                      "properties": {
+                                        "amount": {
+                                          "type": "integer",
+                                          "minimum": -9007199254740991,
+                                          "maximum": 9007199254740991
+                                        },
+                                        "currency": {
+                                          "type": "string"
+                                        }
+                                      },
+                                      "required": [
+                                        "amount",
+                                        "currency"
+                                      ],
+                                      "additionalProperties": false
+                                    },
+                                    "total": {
+                                      "type": "object",
+                                      "properties": {
+                                        "amount": {
+                                          "type": "integer",
+                                          "minimum": -9007199254740991,
+                                          "maximum": 9007199254740991
+                                        },
+                                        "currency": {
+                                          "type": "string"
+                                        }
+                                      },
+                                      "required": [
+                                        "amount",
+                                        "currency"
+                                      ],
+                                      "additionalProperties": false
+                                    }
+                                  },
+                                  "required": [
+                                    "rrp_unit",
+                                    "margin_bps",
+                                    "unit",
+                                    "total"
+                                  ],
+                                  "additionalProperties": false
                                 }
                               },
                               "required": [
@@ -2974,7 +3047,8 @@
                                 "product",
                                 "name",
                                 "quantity",
-                                "unit_price"
+                                "unit_price",
+                                "purchase"
                               ],
                               "additionalProperties": false
                             }
@@ -3032,6 +3106,17 @@
                               "currency"
                             ],
                             "additionalProperties": false
+                          },
+                          "tax_country": {
+                            "nullable": true,
+                            "description": "Buyer country VAT was charged for (ISO alpha-2, lowercase). Null when it was never resolved.",
+                            "type": "string"
+                          },
+                          "tax_rate_bps": {
+                            "type": "integer",
+                            "minimum": -9007199254740991,
+                            "maximum": 9007199254740991,
+                            "description": "VAT rate applied, in basis points (2300 = 23%)."
                           },
                           "gift_card": {
                             "nullable": true,
@@ -3095,6 +3180,53 @@
                             "nullable": true,
                             "type": "string"
                           },
+                          "payment_evidence": {
+                            "nullable": true,
+                            "description": "What the payment provider reported about the charge, stored when the order was paid. Null on orders paid before this was recorded.",
+                            "type": "object",
+                            "properties": {
+                              "card_brand": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "card_country": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "wallet": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "billing_country": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "risk_level": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "risk_score": {
+                                "nullable": true,
+                                "type": "integer",
+                                "minimum": -9007199254740991,
+                                "maximum": 9007199254740991
+                              },
+                              "three_d_secure": {
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "card_brand",
+                              "card_country",
+                              "wallet",
+                              "billing_country",
+                              "risk_level",
+                              "risk_score",
+                              "three_d_secure"
+                            ],
+                            "additionalProperties": false
+                          },
                           "decline_reason": {
                             "nullable": true,
                             "type": "string"
@@ -3120,12 +3252,15 @@
                           "subtotal",
                           "discount",
                           "tax_amount",
+                          "tax_country",
+                          "tax_rate_bps",
                           "gift_card",
                           "total",
                           "coupon_code",
                           "delivery_target",
                           "payment_method",
                           "card_last4",
+                          "payment_evidence",
                           "decline_reason",
                           "created",
                           "paid_at"
@@ -3329,6 +3464,79 @@
                               "currency"
                             ],
                             "additionalProperties": false
+                          },
+                          "purchase": {
+                            "nullable": true,
+                            "description": "What iPago buys this line from you at: your RRP minus iPago's margin, per unit and for the line. Null on lines sold before purchase prices were recorded.",
+                            "type": "object",
+                            "properties": {
+                              "rrp_unit": {
+                                "type": "object",
+                                "properties": {
+                                  "amount": {
+                                    "type": "integer",
+                                    "minimum": -9007199254740991,
+                                    "maximum": 9007199254740991
+                                  },
+                                  "currency": {
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "amount",
+                                  "currency"
+                                ],
+                                "additionalProperties": false
+                              },
+                              "margin_bps": {
+                                "type": "integer",
+                                "minimum": -9007199254740991,
+                                "maximum": 9007199254740991
+                              },
+                              "unit": {
+                                "type": "object",
+                                "properties": {
+                                  "amount": {
+                                    "type": "integer",
+                                    "minimum": -9007199254740991,
+                                    "maximum": 9007199254740991
+                                  },
+                                  "currency": {
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "amount",
+                                  "currency"
+                                ],
+                                "additionalProperties": false
+                              },
+                              "total": {
+                                "type": "object",
+                                "properties": {
+                                  "amount": {
+                                    "type": "integer",
+                                    "minimum": -9007199254740991,
+                                    "maximum": 9007199254740991
+                                  },
+                                  "currency": {
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "amount",
+                                  "currency"
+                                ],
+                                "additionalProperties": false
+                              }
+                            },
+                            "required": [
+                              "rrp_unit",
+                              "margin_bps",
+                              "unit",
+                              "total"
+                            ],
+                            "additionalProperties": false
                           }
                         },
                         "required": [
@@ -3337,7 +3545,8 @@
                           "product",
                           "name",
                           "quantity",
-                          "unit_price"
+                          "unit_price",
+                          "purchase"
                         ],
                         "additionalProperties": false
                       }
@@ -3395,6 +3604,17 @@
                         "currency"
                       ],
                       "additionalProperties": false
+                    },
+                    "tax_country": {
+                      "nullable": true,
+                      "description": "Buyer country VAT was charged for (ISO alpha-2, lowercase). Null when it was never resolved.",
+                      "type": "string"
+                    },
+                    "tax_rate_bps": {
+                      "type": "integer",
+                      "minimum": -9007199254740991,
+                      "maximum": 9007199254740991,
+                      "description": "VAT rate applied, in basis points (2300 = 23%)."
                     },
                     "gift_card": {
                       "nullable": true,
@@ -3458,6 +3678,53 @@
                       "nullable": true,
                       "type": "string"
                     },
+                    "payment_evidence": {
+                      "nullable": true,
+                      "description": "What the payment provider reported about the charge, stored when the order was paid. Null on orders paid before this was recorded.",
+                      "type": "object",
+                      "properties": {
+                        "card_brand": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "card_country": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "wallet": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "billing_country": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "risk_level": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "risk_score": {
+                          "nullable": true,
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        },
+                        "three_d_secure": {
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "card_brand",
+                        "card_country",
+                        "wallet",
+                        "billing_country",
+                        "risk_level",
+                        "risk_score",
+                        "three_d_secure"
+                      ],
+                      "additionalProperties": false
+                    },
                     "decline_reason": {
                       "nullable": true,
                       "type": "string"
@@ -3483,12 +3750,15 @@
                     "subtotal",
                     "discount",
                     "tax_amount",
+                    "tax_country",
+                    "tax_rate_bps",
                     "gift_card",
                     "total",
                     "coupon_code",
                     "delivery_target",
                     "payment_method",
                     "card_last4",
+                    "payment_evidence",
                     "decline_reason",
                     "created",
                     "paid_at"
@@ -11587,6 +11857,79 @@
                                     "currency"
                                   ],
                                   "additionalProperties": false
+                                },
+                                "purchase": {
+                                  "nullable": true,
+                                  "description": "What iPago buys this line from you at: your RRP minus iPago's margin, per unit and for the line. Null on lines sold before purchase prices were recorded.",
+                                  "type": "object",
+                                  "properties": {
+                                    "rrp_unit": {
+                                      "type": "object",
+                                      "properties": {
+                                        "amount": {
+                                          "type": "integer",
+                                          "minimum": -9007199254740991,
+                                          "maximum": 9007199254740991
+                                        },
+                                        "currency": {
+                                          "type": "string"
+                                        }
+                                      },
+                                      "required": [
+                                        "amount",
+                                        "currency"
+                                      ],
+                                      "additionalProperties": false
+                                    },
+                                    "margin_bps": {
+                                      "type": "integer",
+                                      "minimum": -9007199254740991,
+                                      "maximum": 9007199254740991
+                                    },
+                                    "unit": {
+                                      "type": "object",
+                                      "properties": {
+                                        "amount": {
+                                          "type": "integer",
+                                          "minimum": -9007199254740991,
+                                          "maximum": 9007199254740991
+                                        },
+                                        "currency": {
+                                          "type": "string"
+                                        }
+                                      },
+                                      "required": [
+                                        "amount",
+                                        "currency"
+                                      ],
+                                      "additionalProperties": false
+                                    },
+                                    "total": {
+                                      "type": "object",
+                                      "properties": {
+                                        "amount": {
+                                          "type": "integer",
+                                          "minimum": -9007199254740991,
+                                          "maximum": 9007199254740991
+                                        },
+                                        "currency": {
+                                          "type": "string"
+                                        }
+                                      },
+                                      "required": [
+                                        "amount",
+                                        "currency"
+                                      ],
+                                      "additionalProperties": false
+                                    }
+                                  },
+                                  "required": [
+                                    "rrp_unit",
+                                    "margin_bps",
+                                    "unit",
+                                    "total"
+                                  ],
+                                  "additionalProperties": false
                                 }
                               },
                               "required": [
@@ -11595,7 +11938,8 @@
                                 "product",
                                 "name",
                                 "quantity",
-                                "unit_price"
+                                "unit_price",
+                                "purchase"
                               ],
                               "additionalProperties": false
                             }
@@ -11653,6 +11997,17 @@
                               "currency"
                             ],
                             "additionalProperties": false
+                          },
+                          "tax_country": {
+                            "nullable": true,
+                            "description": "Buyer country VAT was charged for (ISO alpha-2, lowercase). Null when it was never resolved.",
+                            "type": "string"
+                          },
+                          "tax_rate_bps": {
+                            "type": "integer",
+                            "minimum": -9007199254740991,
+                            "maximum": 9007199254740991,
+                            "description": "VAT rate applied, in basis points (2300 = 23%)."
                           },
                           "gift_card": {
                             "nullable": true,
@@ -11716,6 +12071,53 @@
                             "nullable": true,
                             "type": "string"
                           },
+                          "payment_evidence": {
+                            "nullable": true,
+                            "description": "What the payment provider reported about the charge, stored when the order was paid. Null on orders paid before this was recorded.",
+                            "type": "object",
+                            "properties": {
+                              "card_brand": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "card_country": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "wallet": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "billing_country": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "risk_level": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "risk_score": {
+                                "nullable": true,
+                                "type": "integer",
+                                "minimum": -9007199254740991,
+                                "maximum": 9007199254740991
+                              },
+                              "three_d_secure": {
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "card_brand",
+                              "card_country",
+                              "wallet",
+                              "billing_country",
+                              "risk_level",
+                              "risk_score",
+                              "three_d_secure"
+                            ],
+                            "additionalProperties": false
+                          },
                           "decline_reason": {
                             "nullable": true,
                             "type": "string"
@@ -11741,12 +12143,15 @@
                           "subtotal",
                           "discount",
                           "tax_amount",
+                          "tax_country",
+                          "tax_rate_bps",
                           "gift_card",
                           "total",
                           "coupon_code",
                           "delivery_target",
                           "payment_method",
                           "card_last4",
+                          "payment_evidence",
                           "decline_reason",
                           "created",
                           "paid_at"
@@ -12014,6 +12419,79 @@
                               "currency"
                             ],
                             "additionalProperties": false
+                          },
+                          "purchase": {
+                            "nullable": true,
+                            "description": "What iPago buys this line from you at: your RRP minus iPago's margin, per unit and for the line. Null on lines sold before purchase prices were recorded.",
+                            "type": "object",
+                            "properties": {
+                              "rrp_unit": {
+                                "type": "object",
+                                "properties": {
+                                  "amount": {
+                                    "type": "integer",
+                                    "minimum": -9007199254740991,
+                                    "maximum": 9007199254740991
+                                  },
+                                  "currency": {
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "amount",
+                                  "currency"
+                                ],
+                                "additionalProperties": false
+                              },
+                              "margin_bps": {
+                                "type": "integer",
+                                "minimum": -9007199254740991,
+                                "maximum": 9007199254740991
+                              },
+                              "unit": {
+                                "type": "object",
+                                "properties": {
+                                  "amount": {
+                                    "type": "integer",
+                                    "minimum": -9007199254740991,
+                                    "maximum": 9007199254740991
+                                  },
+                                  "currency": {
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "amount",
+                                  "currency"
+                                ],
+                                "additionalProperties": false
+                              },
+                              "total": {
+                                "type": "object",
+                                "properties": {
+                                  "amount": {
+                                    "type": "integer",
+                                    "minimum": -9007199254740991,
+                                    "maximum": 9007199254740991
+                                  },
+                                  "currency": {
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "amount",
+                                  "currency"
+                                ],
+                                "additionalProperties": false
+                              }
+                            },
+                            "required": [
+                              "rrp_unit",
+                              "margin_bps",
+                              "unit",
+                              "total"
+                            ],
+                            "additionalProperties": false
                           }
                         },
                         "required": [
@@ -12022,7 +12500,8 @@
                           "product",
                           "name",
                           "quantity",
-                          "unit_price"
+                          "unit_price",
+                          "purchase"
                         ],
                         "additionalProperties": false
                       }
@@ -12080,6 +12559,17 @@
                         "currency"
                       ],
                       "additionalProperties": false
+                    },
+                    "tax_country": {
+                      "nullable": true,
+                      "description": "Buyer country VAT was charged for (ISO alpha-2, lowercase). Null when it was never resolved.",
+                      "type": "string"
+                    },
+                    "tax_rate_bps": {
+                      "type": "integer",
+                      "minimum": -9007199254740991,
+                      "maximum": 9007199254740991,
+                      "description": "VAT rate applied, in basis points (2300 = 23%)."
                     },
                     "gift_card": {
                       "nullable": true,
@@ -12142,6 +12632,53 @@
                     "card_last4": {
                       "nullable": true,
                       "type": "string"
+                    },
+                    "payment_evidence": {
+                      "nullable": true,
+                      "description": "What the payment provider reported about the charge, stored when the order was paid. Null on orders paid before this was recorded.",
+                      "type": "object",
+                      "properties": {
+                        "card_brand": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "card_country": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "wallet": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "billing_country": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "risk_level": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "risk_score": {
+                          "nullable": true,
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        },
+                        "three_d_secure": {
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "card_brand",
+                        "card_country",
+                        "wallet",
+                        "billing_country",
+                        "risk_level",
+                        "risk_score",
+                        "three_d_secure"
+                      ],
+                      "additionalProperties": false
                     },
                     "decline_reason": {
                       "nullable": true,
@@ -12224,11 +12761,19 @@
                       "nullable": true,
                       "type": "object",
                       "properties": {
+                        "payment_method": {
+                          "nullable": true,
+                          "type": "string"
+                        },
                         "card_brand": {
                           "nullable": true,
                           "type": "string"
                         },
                         "card_last4": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "card_country": {
                           "nullable": true,
                           "type": "string"
                         },
@@ -12248,18 +12793,32 @@
                           "nullable": true,
                           "type": "string"
                         },
+                        "risk_score": {
+                          "nullable": true,
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        },
+                        "three_d_secure": {
+                          "nullable": true,
+                          "type": "string"
+                        },
                         "receipt_url": {
                           "nullable": true,
                           "type": "string"
                         }
                       },
                       "required": [
+                        "payment_method",
                         "card_brand",
                         "card_last4",
+                        "card_country",
                         "wallet",
                         "billing_country",
                         "billing_city",
                         "risk_level",
+                        "risk_score",
+                        "three_d_secure",
                         "receipt_url"
                       ],
                       "additionalProperties": false
@@ -12274,12 +12833,15 @@
                     "subtotal",
                     "discount",
                     "tax_amount",
+                    "tax_country",
+                    "tax_rate_bps",
                     "gift_card",
                     "total",
                     "coupon_code",
                     "delivery_target",
                     "payment_method",
                     "card_last4",
+                    "payment_evidence",
                     "decline_reason",
                     "created",
                     "paid_at",
@@ -14160,6 +14722,181 @@
         }
       }
     },
+    "/v1/stores/{storeId}/notifications": {
+      "get": {
+        "operationId": "listStoreNotifications",
+        "parameters": [
+          {
+            "schema": {
+              "default": "live",
+              "type": "string",
+              "enum": [
+                "live",
+                "test"
+              ]
+            },
+            "in": "query",
+            "name": "mode",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "storeId",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "object": {
+                      "type": "string",
+                      "enum": [
+                        "list"
+                      ]
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "object": {
+                            "type": "string",
+                            "enum": [
+                              "event"
+                            ]
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "created": {
+                            "type": "string"
+                          },
+                          "data": {}
+                        },
+                        "required": [
+                          "object",
+                          "id",
+                          "type",
+                          "created",
+                          "data"
+                        ],
+                        "additionalProperties": false
+                      }
+                    },
+                    "has_more": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "object",
+                    "data",
+                    "has_more"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string"
+                        },
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "param": {
+                          "type": "string"
+                        },
+                        "request_id": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "type",
+                        "code",
+                        "message",
+                        "request_id"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string"
+                        },
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "param": {
+                          "type": "string"
+                        },
+                        "request_id": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "type",
+                        "code",
+                        "message",
+                        "request_id"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v1/stores/{storeId}/preview-token": {
       "post": {
         "operationId": "createStorePreviewToken",
@@ -14826,12 +15563,534 @@
                         ],
                         "additionalProperties": false
                       }
+                    },
+                    "summary": {
+                      "type": "object",
+                      "properties": {
+                        "customers": {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        },
+                        "returning_customers": {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        },
+                        "new_customers_30d": {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        },
+                        "average_lifetime_value": {
+                          "type": "object",
+                          "properties": {
+                            "amount": {
+                              "type": "integer",
+                              "minimum": -9007199254740991,
+                              "maximum": 9007199254740991
+                            },
+                            "currency": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "amount",
+                            "currency"
+                          ],
+                          "additionalProperties": false
+                        }
+                      },
+                      "required": [
+                        "customers",
+                        "returning_customers",
+                        "new_customers_30d",
+                        "average_lifetime_value"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "countries": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "country": {
+                            "type": "string"
+                          },
+                          "customers": {
+                            "type": "integer",
+                            "minimum": -9007199254740991,
+                            "maximum": 9007199254740991
+                          },
+                          "orders": {
+                            "type": "integer",
+                            "minimum": -9007199254740991,
+                            "maximum": 9007199254740991
+                          },
+                          "revenue": {
+                            "type": "object",
+                            "properties": {
+                              "amount": {
+                                "type": "integer",
+                                "minimum": -9007199254740991,
+                                "maximum": 9007199254740991
+                              },
+                              "currency": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "amount",
+                              "currency"
+                            ],
+                            "additionalProperties": false
+                          }
+                        },
+                        "required": [
+                          "country",
+                          "customers",
+                          "orders",
+                          "revenue"
+                        ],
+                        "additionalProperties": false
+                      }
                     }
                   },
                   "required": [
                     "object",
                     "top_buyers",
-                    "top_refunded"
+                    "top_refunded",
+                    "summary",
+                    "countries"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string"
+                        },
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "param": {
+                          "type": "string"
+                        },
+                        "request_id": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "type",
+                        "code",
+                        "message",
+                        "request_id"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string"
+                        },
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "param": {
+                          "type": "string"
+                        },
+                        "request_id": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "type",
+                        "code",
+                        "message",
+                        "request_id"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/stores/{storeId}/customers/lookup": {
+      "get": {
+        "operationId": "storeCustomerDetail",
+        "parameters": [
+          {
+            "schema": {
+              "default": "live",
+              "type": "string",
+              "enum": [
+                "live",
+                "test"
+              ]
+            },
+            "in": "query",
+            "name": "mode",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64
+            },
+            "in": "query",
+            "name": "game_username",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "storeId",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "object": {
+                      "type": "string",
+                      "enum": [
+                        "customer_detail"
+                      ]
+                    },
+                    "game_username": {
+                      "type": "string"
+                    },
+                    "email": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "blocked": {
+                      "type": "boolean"
+                    },
+                    "orders": {
+                      "type": "integer",
+                      "minimum": -9007199254740991,
+                      "maximum": 9007199254740991
+                    },
+                    "total_spent": {
+                      "type": "object",
+                      "properties": {
+                        "amount": {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        },
+                        "currency": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "amount",
+                        "currency"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "first_order": {
+                      "type": "string"
+                    },
+                    "last_order": {
+                      "type": "string"
+                    },
+                    "countries": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "payment_methods": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "method": {
+                            "type": "string"
+                          },
+                          "orders": {
+                            "type": "integer",
+                            "minimum": -9007199254740991,
+                            "maximum": 9007199254740991
+                          }
+                        },
+                        "required": [
+                          "method",
+                          "orders"
+                        ],
+                        "additionalProperties": false
+                      }
+                    },
+                    "refunds": {
+                      "type": "object",
+                      "properties": {
+                        "count": {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        },
+                        "total": {
+                          "type": "object",
+                          "properties": {
+                            "amount": {
+                              "type": "integer",
+                              "minimum": -9007199254740991,
+                              "maximum": 9007199254740991
+                            },
+                            "currency": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "amount",
+                            "currency"
+                          ],
+                          "additionalProperties": false
+                        }
+                      },
+                      "required": [
+                        "count",
+                        "total"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "disputes": {
+                      "type": "object",
+                      "properties": {
+                        "count": {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        },
+                        "lost": {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        }
+                      },
+                      "required": [
+                        "count",
+                        "lost"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "products": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "product": {
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "units": {
+                            "type": "integer",
+                            "minimum": -9007199254740991,
+                            "maximum": 9007199254740991
+                          },
+                          "spent": {
+                            "type": "object",
+                            "properties": {
+                              "amount": {
+                                "type": "integer",
+                                "minimum": -9007199254740991,
+                                "maximum": 9007199254740991
+                              },
+                              "currency": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "amount",
+                              "currency"
+                            ],
+                            "additionalProperties": false
+                          }
+                        },
+                        "required": [
+                          "product",
+                          "name",
+                          "units",
+                          "spent"
+                        ],
+                        "additionalProperties": false
+                      }
+                    },
+                    "coupons": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "gift_card_orders": {
+                      "type": "integer",
+                      "minimum": -9007199254740991,
+                      "maximum": 9007199254740991
+                    },
+                    "recent_orders": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "created": {
+                            "type": "string"
+                          },
+                          "total": {
+                            "type": "object",
+                            "properties": {
+                              "amount": {
+                                "type": "integer",
+                                "minimum": -9007199254740991,
+                                "maximum": 9007199254740991
+                              },
+                              "currency": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "amount",
+                              "currency"
+                            ],
+                            "additionalProperties": false
+                          },
+                          "amount_refunded": {
+                            "type": "integer",
+                            "minimum": -9007199254740991,
+                            "maximum": 9007199254740991
+                          },
+                          "payment_method": {
+                            "nullable": true,
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "created",
+                          "total",
+                          "amount_refunded",
+                          "payment_method"
+                        ],
+                        "additionalProperties": false
+                      }
+                    }
+                  },
+                  "required": [
+                    "object",
+                    "game_username",
+                    "email",
+                    "blocked",
+                    "orders",
+                    "total_spent",
+                    "first_order",
+                    "last_order",
+                    "countries",
+                    "payment_methods",
+                    "refunds",
+                    "disputes",
+                    "products",
+                    "coupons",
+                    "gift_card_orders",
+                    "recent_orders"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string"
+                        },
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "param": {
+                          "type": "string"
+                        },
+                        "request_id": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "type",
+                        "code",
+                        "message",
+                        "request_id"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "error"
                   ],
                   "additionalProperties": false
                 }
@@ -21232,6 +22491,79 @@
                                     "currency"
                                   ],
                                   "additionalProperties": false
+                                },
+                                "purchase": {
+                                  "nullable": true,
+                                  "description": "What iPago buys this line from you at: your RRP minus iPago's margin, per unit and for the line. Null on lines sold before purchase prices were recorded.",
+                                  "type": "object",
+                                  "properties": {
+                                    "rrp_unit": {
+                                      "type": "object",
+                                      "properties": {
+                                        "amount": {
+                                          "type": "integer",
+                                          "minimum": -9007199254740991,
+                                          "maximum": 9007199254740991
+                                        },
+                                        "currency": {
+                                          "type": "string"
+                                        }
+                                      },
+                                      "required": [
+                                        "amount",
+                                        "currency"
+                                      ],
+                                      "additionalProperties": false
+                                    },
+                                    "margin_bps": {
+                                      "type": "integer",
+                                      "minimum": -9007199254740991,
+                                      "maximum": 9007199254740991
+                                    },
+                                    "unit": {
+                                      "type": "object",
+                                      "properties": {
+                                        "amount": {
+                                          "type": "integer",
+                                          "minimum": -9007199254740991,
+                                          "maximum": 9007199254740991
+                                        },
+                                        "currency": {
+                                          "type": "string"
+                                        }
+                                      },
+                                      "required": [
+                                        "amount",
+                                        "currency"
+                                      ],
+                                      "additionalProperties": false
+                                    },
+                                    "total": {
+                                      "type": "object",
+                                      "properties": {
+                                        "amount": {
+                                          "type": "integer",
+                                          "minimum": -9007199254740991,
+                                          "maximum": 9007199254740991
+                                        },
+                                        "currency": {
+                                          "type": "string"
+                                        }
+                                      },
+                                      "required": [
+                                        "amount",
+                                        "currency"
+                                      ],
+                                      "additionalProperties": false
+                                    }
+                                  },
+                                  "required": [
+                                    "rrp_unit",
+                                    "margin_bps",
+                                    "unit",
+                                    "total"
+                                  ],
+                                  "additionalProperties": false
                                 }
                               },
                               "required": [
@@ -21240,7 +22572,8 @@
                                 "product",
                                 "name",
                                 "quantity",
-                                "unit_price"
+                                "unit_price",
+                                "purchase"
                               ],
                               "additionalProperties": false
                             }
@@ -21298,6 +22631,17 @@
                               "currency"
                             ],
                             "additionalProperties": false
+                          },
+                          "tax_country": {
+                            "nullable": true,
+                            "description": "Buyer country VAT was charged for (ISO alpha-2, lowercase). Null when it was never resolved.",
+                            "type": "string"
+                          },
+                          "tax_rate_bps": {
+                            "type": "integer",
+                            "minimum": -9007199254740991,
+                            "maximum": 9007199254740991,
+                            "description": "VAT rate applied, in basis points (2300 = 23%)."
                           },
                           "gift_card": {
                             "nullable": true,
@@ -21361,6 +22705,53 @@
                             "nullable": true,
                             "type": "string"
                           },
+                          "payment_evidence": {
+                            "nullable": true,
+                            "description": "What the payment provider reported about the charge, stored when the order was paid. Null on orders paid before this was recorded.",
+                            "type": "object",
+                            "properties": {
+                              "card_brand": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "card_country": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "wallet": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "billing_country": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "risk_level": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "risk_score": {
+                                "nullable": true,
+                                "type": "integer",
+                                "minimum": -9007199254740991,
+                                "maximum": 9007199254740991
+                              },
+                              "three_d_secure": {
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "card_brand",
+                              "card_country",
+                              "wallet",
+                              "billing_country",
+                              "risk_level",
+                              "risk_score",
+                              "three_d_secure"
+                            ],
+                            "additionalProperties": false
+                          },
                           "decline_reason": {
                             "nullable": true,
                             "type": "string"
@@ -21405,12 +22796,15 @@
                           "subtotal",
                           "discount",
                           "tax_amount",
+                          "tax_country",
+                          "tax_rate_bps",
                           "gift_card",
                           "total",
                           "coupon_code",
                           "delivery_target",
                           "payment_method",
                           "card_last4",
+                          "payment_evidence",
                           "decline_reason",
                           "created",
                           "paid_at",
@@ -34537,6 +35931,480 @@
         }
       }
     },
+    "/v1/accounts/{accountId}/tax-profile": {
+      "get": {
+        "operationId": "getAccountTaxProfile",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "accountId",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "object": {
+                      "type": "string",
+                      "enum": [
+                        "tax_profile"
+                      ]
+                    },
+                    "vat_status": {
+                      "nullable": true,
+                      "type": "string",
+                      "enum": [
+                        "pl_vat",
+                        "eu_vat",
+                        "non_eu",
+                        "not_registered"
+                      ]
+                    },
+                    "vat_id": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "establishment_country": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "updated": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "self_billing_agreed_at": {
+                      "nullable": true,
+                      "description": "Set by iPago staff when the signed self-billing agreement is on file.",
+                      "type": "string"
+                    },
+                    "self_billing_agreement_version": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "ksef_permission_at": {
+                      "nullable": true,
+                      "description": "Set by iPago staff when the supplier's KSeF self-billing grant is on file. Polish VAT payers only.",
+                      "type": "string"
+                    },
+                    "invoice_blockers": {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "enum": [
+                          "tax_profile_missing",
+                          "not_vat_registered",
+                          "agreement_missing",
+                          "ksef_permission_missing"
+                        ]
+                      },
+                      "description": "Why no weekly self-billing invoice can be issued yet. Empty when nothing is missing."
+                    }
+                  },
+                  "required": [
+                    "object",
+                    "vat_status",
+                    "vat_id",
+                    "establishment_country",
+                    "updated",
+                    "self_billing_agreed_at",
+                    "self_billing_agreement_version",
+                    "ksef_permission_at",
+                    "invoice_blockers"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string"
+                        },
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "param": {
+                          "type": "string"
+                        },
+                        "request_id": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "type",
+                        "code",
+                        "message",
+                        "request_id"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string"
+                        },
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "param": {
+                          "type": "string"
+                        },
+                        "request_id": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "type",
+                        "code",
+                        "message",
+                        "request_id"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "operationId": "setAccountTaxProfile",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "vat_status": {
+                    "type": "string"
+                  },
+                  "vat_id": {
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "establishment_country": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "vat_status",
+                  "establishment_country"
+                ]
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "accountId",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "object": {
+                      "type": "string",
+                      "enum": [
+                        "tax_profile"
+                      ]
+                    },
+                    "vat_status": {
+                      "nullable": true,
+                      "type": "string",
+                      "enum": [
+                        "pl_vat",
+                        "eu_vat",
+                        "non_eu",
+                        "not_registered"
+                      ]
+                    },
+                    "vat_id": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "establishment_country": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "updated": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "self_billing_agreed_at": {
+                      "nullable": true,
+                      "description": "Set by iPago staff when the signed self-billing agreement is on file.",
+                      "type": "string"
+                    },
+                    "self_billing_agreement_version": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "ksef_permission_at": {
+                      "nullable": true,
+                      "description": "Set by iPago staff when the supplier's KSeF self-billing grant is on file. Polish VAT payers only.",
+                      "type": "string"
+                    },
+                    "invoice_blockers": {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "enum": [
+                          "tax_profile_missing",
+                          "not_vat_registered",
+                          "agreement_missing",
+                          "ksef_permission_missing"
+                        ]
+                      },
+                      "description": "Why no weekly self-billing invoice can be issued yet. Empty when nothing is missing."
+                    }
+                  },
+                  "required": [
+                    "object",
+                    "vat_status",
+                    "vat_id",
+                    "establishment_country",
+                    "updated",
+                    "self_billing_agreed_at",
+                    "self_billing_agreement_version",
+                    "ksef_permission_at",
+                    "invoice_blockers"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string"
+                        },
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "param": {
+                          "type": "string"
+                        },
+                        "request_id": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "type",
+                        "code",
+                        "message",
+                        "request_id"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string"
+                        },
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "param": {
+                          "type": "string"
+                        },
+                        "request_id": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "type",
+                        "code",
+                        "message",
+                        "request_id"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string"
+                        },
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "param": {
+                          "type": "string"
+                        },
+                        "request_id": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "type",
+                        "code",
+                        "message",
+                        "request_id"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string"
+                        },
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "param": {
+                          "type": "string"
+                        },
+                        "request_id": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "type",
+                        "code",
+                        "message",
+                        "request_id"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v1/stores/{storeId}/categories": {
       "post": {
         "operationId": "createStoreCategory",
@@ -41726,6 +43594,7 @@
                     "type": "string"
                   },
                   "country": {
+                    "description": "Ignored for VAT: the country comes from the storefront server.",
                     "type": "string",
                     "minLength": 2,
                     "maxLength": 2
@@ -48423,6 +50292,79 @@
                               "currency"
                             ],
                             "additionalProperties": false
+                          },
+                          "purchase": {
+                            "nullable": true,
+                            "description": "What iPago buys this line from you at: your RRP minus iPago's margin, per unit and for the line. Null on lines sold before purchase prices were recorded.",
+                            "type": "object",
+                            "properties": {
+                              "rrp_unit": {
+                                "type": "object",
+                                "properties": {
+                                  "amount": {
+                                    "type": "integer",
+                                    "minimum": -9007199254740991,
+                                    "maximum": 9007199254740991
+                                  },
+                                  "currency": {
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "amount",
+                                  "currency"
+                                ],
+                                "additionalProperties": false
+                              },
+                              "margin_bps": {
+                                "type": "integer",
+                                "minimum": -9007199254740991,
+                                "maximum": 9007199254740991
+                              },
+                              "unit": {
+                                "type": "object",
+                                "properties": {
+                                  "amount": {
+                                    "type": "integer",
+                                    "minimum": -9007199254740991,
+                                    "maximum": 9007199254740991
+                                  },
+                                  "currency": {
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "amount",
+                                  "currency"
+                                ],
+                                "additionalProperties": false
+                              },
+                              "total": {
+                                "type": "object",
+                                "properties": {
+                                  "amount": {
+                                    "type": "integer",
+                                    "minimum": -9007199254740991,
+                                    "maximum": 9007199254740991
+                                  },
+                                  "currency": {
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "amount",
+                                  "currency"
+                                ],
+                                "additionalProperties": false
+                              }
+                            },
+                            "required": [
+                              "rrp_unit",
+                              "margin_bps",
+                              "unit",
+                              "total"
+                            ],
+                            "additionalProperties": false
                           }
                         },
                         "required": [
@@ -48431,7 +50373,8 @@
                           "product",
                           "name",
                           "quantity",
-                          "unit_price"
+                          "unit_price",
+                          "purchase"
                         ],
                         "additionalProperties": false
                       }
@@ -48489,6 +50432,17 @@
                         "currency"
                       ],
                       "additionalProperties": false
+                    },
+                    "tax_country": {
+                      "nullable": true,
+                      "description": "Buyer country VAT was charged for (ISO alpha-2, lowercase). Null when it was never resolved.",
+                      "type": "string"
+                    },
+                    "tax_rate_bps": {
+                      "type": "integer",
+                      "minimum": -9007199254740991,
+                      "maximum": 9007199254740991,
+                      "description": "VAT rate applied, in basis points (2300 = 23%)."
                     },
                     "gift_card": {
                       "nullable": true,
@@ -48551,6 +50505,53 @@
                     "card_last4": {
                       "nullable": true,
                       "type": "string"
+                    },
+                    "payment_evidence": {
+                      "nullable": true,
+                      "description": "What the payment provider reported about the charge, stored when the order was paid. Null on orders paid before this was recorded.",
+                      "type": "object",
+                      "properties": {
+                        "card_brand": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "card_country": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "wallet": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "billing_country": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "risk_level": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "risk_score": {
+                          "nullable": true,
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        },
+                        "three_d_secure": {
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "card_brand",
+                        "card_country",
+                        "wallet",
+                        "billing_country",
+                        "risk_level",
+                        "risk_score",
+                        "three_d_secure"
+                      ],
+                      "additionalProperties": false
                     },
                     "decline_reason": {
                       "nullable": true,
@@ -48653,12 +50654,15 @@
                     "subtotal",
                     "discount",
                     "tax_amount",
+                    "tax_country",
+                    "tax_rate_bps",
                     "gift_card",
                     "total",
                     "coupon_code",
                     "delivery_target",
                     "payment_method",
                     "card_last4",
+                    "payment_evidence",
                     "decline_reason",
                     "created",
                     "paid_at",

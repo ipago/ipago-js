@@ -1133,6 +1133,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/stores/{storeId}/notifications": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["listStoreNotifications"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/stores/{storeId}/preview-token": {
         parameters: {
             query?: never;
@@ -1173,6 +1189,22 @@ export interface paths {
             cookie?: never;
         };
         get: operations["storeCustomerInsights"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/stores/{storeId}/customers/lookup": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["storeCustomerDetail"];
         put?: never;
         post?: never;
         delete?: never;
@@ -2038,6 +2070,22 @@ export interface paths {
         };
         get: operations["getAccountPayoutDestination"];
         put: operations["setAccountPayoutDestination"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/accounts/{accountId}/tax-profile": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getAccountTaxProfile"];
+        put: operations["setAccountTaxProfile"];
         post?: never;
         delete?: never;
         options?: never;
@@ -3960,6 +4008,22 @@ export interface operations {
                                     amount: number;
                                     currency: string;
                                 };
+                                /** @description What iPago buys this line from you at: your RRP minus iPago's margin, per unit and for the line. Null on lines sold before purchase prices were recorded. */
+                                purchase: {
+                                    rrp_unit: {
+                                        amount: number;
+                                        currency: string;
+                                    };
+                                    margin_bps: number;
+                                    unit: {
+                                        amount: number;
+                                        currency: string;
+                                    };
+                                    total: {
+                                        amount: number;
+                                        currency: string;
+                                    };
+                                } | null;
                             }[];
                             subtotal: {
                                 amount: number;
@@ -3973,6 +4037,10 @@ export interface operations {
                                 amount: number;
                                 currency: string;
                             };
+                            /** @description Buyer country VAT was charged for (ISO alpha-2, lowercase). Null when it was never resolved. */
+                            tax_country: string | null;
+                            /** @description VAT rate applied, in basis points (2300 = 23%). */
+                            tax_rate_bps: number;
                             gift_card: {
                                 amount: {
                                     amount: number;
@@ -3987,6 +4055,16 @@ export interface operations {
                             delivery_target: string | null;
                             payment_method: string | null;
                             card_last4: string | null;
+                            /** @description What the payment provider reported about the charge, stored when the order was paid. Null on orders paid before this was recorded. */
+                            payment_evidence: {
+                                card_brand: string | null;
+                                card_country: string | null;
+                                wallet: string | null;
+                                billing_country: string | null;
+                                risk_level: string | null;
+                                risk_score: number | null;
+                                three_d_secure: string | null;
+                            } | null;
                             decline_reason: string | null;
                             refunded_at?: string | null;
                             created: string;
@@ -4069,6 +4147,22 @@ export interface operations {
                                 amount: number;
                                 currency: string;
                             };
+                            /** @description What iPago buys this line from you at: your RRP minus iPago's margin, per unit and for the line. Null on lines sold before purchase prices were recorded. */
+                            purchase: {
+                                rrp_unit: {
+                                    amount: number;
+                                    currency: string;
+                                };
+                                margin_bps: number;
+                                unit: {
+                                    amount: number;
+                                    currency: string;
+                                };
+                                total: {
+                                    amount: number;
+                                    currency: string;
+                                };
+                            } | null;
                         }[];
                         subtotal: {
                             amount: number;
@@ -4082,6 +4176,10 @@ export interface operations {
                             amount: number;
                             currency: string;
                         };
+                        /** @description Buyer country VAT was charged for (ISO alpha-2, lowercase). Null when it was never resolved. */
+                        tax_country: string | null;
+                        /** @description VAT rate applied, in basis points (2300 = 23%). */
+                        tax_rate_bps: number;
                         gift_card: {
                             amount: {
                                 amount: number;
@@ -4096,6 +4194,16 @@ export interface operations {
                         delivery_target: string | null;
                         payment_method: string | null;
                         card_last4: string | null;
+                        /** @description What the payment provider reported about the charge, stored when the order was paid. Null on orders paid before this was recorded. */
+                        payment_evidence: {
+                            card_brand: string | null;
+                            card_country: string | null;
+                            wallet: string | null;
+                            billing_country: string | null;
+                            risk_level: string | null;
+                            risk_score: number | null;
+                            three_d_secure: string | null;
+                        } | null;
                         decline_reason: string | null;
                         refunded_at?: string | null;
                         created: string;
@@ -7403,6 +7511,22 @@ export interface operations {
                                     amount: number;
                                     currency: string;
                                 };
+                                /** @description What iPago buys this line from you at: your RRP minus iPago's margin, per unit and for the line. Null on lines sold before purchase prices were recorded. */
+                                purchase: {
+                                    rrp_unit: {
+                                        amount: number;
+                                        currency: string;
+                                    };
+                                    margin_bps: number;
+                                    unit: {
+                                        amount: number;
+                                        currency: string;
+                                    };
+                                    total: {
+                                        amount: number;
+                                        currency: string;
+                                    };
+                                } | null;
                             }[];
                             subtotal: {
                                 amount: number;
@@ -7416,6 +7540,10 @@ export interface operations {
                                 amount: number;
                                 currency: string;
                             };
+                            /** @description Buyer country VAT was charged for (ISO alpha-2, lowercase). Null when it was never resolved. */
+                            tax_country: string | null;
+                            /** @description VAT rate applied, in basis points (2300 = 23%). */
+                            tax_rate_bps: number;
                             gift_card: {
                                 amount: {
                                     amount: number;
@@ -7430,6 +7558,16 @@ export interface operations {
                             delivery_target: string | null;
                             payment_method: string | null;
                             card_last4: string | null;
+                            /** @description What the payment provider reported about the charge, stored when the order was paid. Null on orders paid before this was recorded. */
+                            payment_evidence: {
+                                card_brand: string | null;
+                                card_country: string | null;
+                                wallet: string | null;
+                                billing_country: string | null;
+                                risk_level: string | null;
+                                risk_score: number | null;
+                                three_d_secure: string | null;
+                            } | null;
                             decline_reason: string | null;
                             refunded_at?: string | null;
                             created: string;
@@ -7532,6 +7670,22 @@ export interface operations {
                                 amount: number;
                                 currency: string;
                             };
+                            /** @description What iPago buys this line from you at: your RRP minus iPago's margin, per unit and for the line. Null on lines sold before purchase prices were recorded. */
+                            purchase: {
+                                rrp_unit: {
+                                    amount: number;
+                                    currency: string;
+                                };
+                                margin_bps: number;
+                                unit: {
+                                    amount: number;
+                                    currency: string;
+                                };
+                                total: {
+                                    amount: number;
+                                    currency: string;
+                                };
+                            } | null;
                         }[];
                         subtotal: {
                             amount: number;
@@ -7545,6 +7699,10 @@ export interface operations {
                             amount: number;
                             currency: string;
                         };
+                        /** @description Buyer country VAT was charged for (ISO alpha-2, lowercase). Null when it was never resolved. */
+                        tax_country: string | null;
+                        /** @description VAT rate applied, in basis points (2300 = 23%). */
+                        tax_rate_bps: number;
                         gift_card: {
                             amount: {
                                 amount: number;
@@ -7559,6 +7717,16 @@ export interface operations {
                         delivery_target: string | null;
                         payment_method: string | null;
                         card_last4: string | null;
+                        /** @description What the payment provider reported about the charge, stored when the order was paid. Null on orders paid before this was recorded. */
+                        payment_evidence: {
+                            card_brand: string | null;
+                            card_country: string | null;
+                            wallet: string | null;
+                            billing_country: string | null;
+                            risk_level: string | null;
+                            risk_score: number | null;
+                            three_d_secure: string | null;
+                        } | null;
                         decline_reason: string | null;
                         refunded_at?: string | null;
                         created: string;
@@ -7577,12 +7745,16 @@ export interface operations {
                             detail: string | null;
                         }[];
                         payment_details?: {
+                            payment_method: string | null;
                             card_brand: string | null;
                             card_last4: string | null;
+                            card_country: string | null;
                             wallet: string | null;
                             billing_country: string | null;
                             billing_city: string | null;
                             risk_level: string | null;
+                            risk_score: number | null;
+                            three_d_secure: string | null;
                             receipt_url: string | null;
                         } | null;
                     };
@@ -8248,6 +8420,76 @@ export interface operations {
             };
         };
     };
+    listStoreNotifications: {
+        parameters: {
+            query?: {
+                mode?: "live" | "test";
+            };
+            header?: never;
+            path: {
+                storeId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @enum {string} */
+                        object: "list";
+                        data: {
+                            /** @enum {string} */
+                            object: "event";
+                            id: string;
+                            type: string;
+                            created: string;
+                            data: unknown;
+                        }[];
+                        has_more: boolean;
+                    };
+                };
+            };
+            /** @description Default Response */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+            /** @description Default Response */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
     createStorePreviewToken: {
         parameters: {
             query?: never;
@@ -8470,6 +8712,150 @@ export interface operations {
                                 currency: string;
                             };
                         }[];
+                        summary: {
+                            customers: number;
+                            returning_customers: number;
+                            new_customers_30d: number;
+                            average_lifetime_value: {
+                                amount: number;
+                                currency: string;
+                            };
+                        };
+                        countries: {
+                            country: string;
+                            customers: number;
+                            orders: number;
+                            revenue: {
+                                amount: number;
+                                currency: string;
+                            };
+                        }[];
+                    };
+                };
+            };
+            /** @description Default Response */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+            /** @description Default Response */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    storeCustomerDetail: {
+        parameters: {
+            query: {
+                mode?: "live" | "test";
+                game_username: string;
+            };
+            header?: never;
+            path: {
+                storeId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @enum {string} */
+                        object: "customer_detail";
+                        game_username: string;
+                        email: string | null;
+                        blocked: boolean;
+                        orders: number;
+                        total_spent: {
+                            amount: number;
+                            currency: string;
+                        };
+                        first_order: string;
+                        last_order: string;
+                        countries: string[];
+                        payment_methods: {
+                            method: string;
+                            orders: number;
+                        }[];
+                        refunds: {
+                            count: number;
+                            total: {
+                                amount: number;
+                                currency: string;
+                            };
+                        };
+                        disputes: {
+                            count: number;
+                            lost: number;
+                        };
+                        products: {
+                            product: string;
+                            name: string;
+                            units: number;
+                            spent: {
+                                amount: number;
+                                currency: string;
+                            };
+                        }[];
+                        coupons: string[];
+                        gift_card_orders: number;
+                        recent_orders: {
+                            id: string;
+                            created: string;
+                            total: {
+                                amount: number;
+                                currency: string;
+                            };
+                            amount_refunded: number;
+                            payment_method: string | null;
+                        }[];
+                    };
+                };
+            };
+            /** @description Default Response */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
                     };
                 };
             };
@@ -10795,6 +11181,22 @@ export interface operations {
                                     amount: number;
                                     currency: string;
                                 };
+                                /** @description What iPago buys this line from you at: your RRP minus iPago's margin, per unit and for the line. Null on lines sold before purchase prices were recorded. */
+                                purchase: {
+                                    rrp_unit: {
+                                        amount: number;
+                                        currency: string;
+                                    };
+                                    margin_bps: number;
+                                    unit: {
+                                        amount: number;
+                                        currency: string;
+                                    };
+                                    total: {
+                                        amount: number;
+                                        currency: string;
+                                    };
+                                } | null;
                             }[];
                             subtotal: {
                                 amount: number;
@@ -10808,6 +11210,10 @@ export interface operations {
                                 amount: number;
                                 currency: string;
                             };
+                            /** @description Buyer country VAT was charged for (ISO alpha-2, lowercase). Null when it was never resolved. */
+                            tax_country: string | null;
+                            /** @description VAT rate applied, in basis points (2300 = 23%). */
+                            tax_rate_bps: number;
                             gift_card: {
                                 amount: {
                                     amount: number;
@@ -10822,6 +11228,16 @@ export interface operations {
                             delivery_target: string | null;
                             payment_method: string | null;
                             card_last4: string | null;
+                            /** @description What the payment provider reported about the charge, stored when the order was paid. Null on orders paid before this was recorded. */
+                            payment_evidence: {
+                                card_brand: string | null;
+                                card_country: string | null;
+                                wallet: string | null;
+                                billing_country: string | null;
+                                risk_level: string | null;
+                                risk_score: number | null;
+                                three_d_secure: string | null;
+                            } | null;
                             decline_reason: string | null;
                             refunded_at?: string | null;
                             created: string;
@@ -15772,6 +16188,190 @@ export interface operations {
             };
         };
     };
+    getAccountTaxProfile: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                accountId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @enum {string} */
+                        object: "tax_profile";
+                        /** @enum {string|null} */
+                        vat_status: "pl_vat" | "eu_vat" | "non_eu" | "not_registered" | null;
+                        vat_id: string | null;
+                        establishment_country: string | null;
+                        updated: string | null;
+                        /** @description Set by iPago staff when the signed self-billing agreement is on file. */
+                        self_billing_agreed_at: string | null;
+                        self_billing_agreement_version: string | null;
+                        /** @description Set by iPago staff when the supplier's KSeF self-billing grant is on file. Polish VAT payers only. */
+                        ksef_permission_at: string | null;
+                        /** @description Why no weekly self-billing invoice can be issued yet. Empty when nothing is missing. */
+                        invoice_blockers: ("tax_profile_missing" | "not_vat_registered" | "agreement_missing" | "ksef_permission_missing")[];
+                    };
+                };
+            };
+            /** @description Default Response */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+            /** @description Default Response */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    setAccountTaxProfile: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                accountId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    vat_status: string;
+                    vat_id?: string | null;
+                    establishment_country: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @enum {string} */
+                        object: "tax_profile";
+                        /** @enum {string|null} */
+                        vat_status: "pl_vat" | "eu_vat" | "non_eu" | "not_registered" | null;
+                        vat_id: string | null;
+                        establishment_country: string | null;
+                        updated: string | null;
+                        /** @description Set by iPago staff when the signed self-billing agreement is on file. */
+                        self_billing_agreed_at: string | null;
+                        self_billing_agreement_version: string | null;
+                        /** @description Set by iPago staff when the supplier's KSeF self-billing grant is on file. Polish VAT payers only. */
+                        ksef_permission_at: string | null;
+                        /** @description Why no weekly self-billing invoice can be issued yet. Empty when nothing is missing. */
+                        invoice_blockers: ("tax_profile_missing" | "not_vat_registered" | "agreement_missing" | "ksef_permission_missing")[];
+                    };
+                };
+            };
+            /** @description Default Response */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+            /** @description Default Response */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+            /** @description Default Response */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+            /** @description Default Response */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
     listStoreCategories: {
         parameters: {
             query?: {
@@ -18246,6 +18846,7 @@ export interface operations {
                 "application/json": {
                     customer_email?: string;
                     method?: string;
+                    /** @description Ignored for VAT: the country comes from the storefront server. */
                     country?: string;
                 };
             };
@@ -20761,6 +21362,22 @@ export interface operations {
                                 amount: number;
                                 currency: string;
                             };
+                            /** @description What iPago buys this line from you at: your RRP minus iPago's margin, per unit and for the line. Null on lines sold before purchase prices were recorded. */
+                            purchase: {
+                                rrp_unit: {
+                                    amount: number;
+                                    currency: string;
+                                };
+                                margin_bps: number;
+                                unit: {
+                                    amount: number;
+                                    currency: string;
+                                };
+                                total: {
+                                    amount: number;
+                                    currency: string;
+                                };
+                            } | null;
                         }[];
                         subtotal: {
                             amount: number;
@@ -20774,6 +21391,10 @@ export interface operations {
                             amount: number;
                             currency: string;
                         };
+                        /** @description Buyer country VAT was charged for (ISO alpha-2, lowercase). Null when it was never resolved. */
+                        tax_country: string | null;
+                        /** @description VAT rate applied, in basis points (2300 = 23%). */
+                        tax_rate_bps: number;
                         gift_card: {
                             amount: {
                                 amount: number;
@@ -20788,6 +21409,16 @@ export interface operations {
                         delivery_target: string | null;
                         payment_method: string | null;
                         card_last4: string | null;
+                        /** @description What the payment provider reported about the charge, stored when the order was paid. Null on orders paid before this was recorded. */
+                        payment_evidence: {
+                            card_brand: string | null;
+                            card_country: string | null;
+                            wallet: string | null;
+                            billing_country: string | null;
+                            risk_level: string | null;
+                            risk_score: number | null;
+                            three_d_secure: string | null;
+                        } | null;
                         decline_reason: string | null;
                         refunded_at?: string | null;
                         created: string;
