@@ -2497,7 +2497,8 @@
                       "required": [
                         "product"
                       ]
-                    }
+                    },
+                    "description": "One-time products in any number, or a single subscription product with quantity 1."
                   },
                   "customer_email": {
                     "type": "string"
@@ -2514,7 +2515,7 @@
                     "maxLength": 2
                   },
                   "withdrawal_waiver": {
-                    "description": "Pass true once your checkout has asked the buyer to agree to immediate delivery and to losing the 14-day right of withdrawal. iPago records the time on the order.",
+                    "description": "Pass true once your checkout has asked the buyer to agree to immediate delivery and to losing the 14-day right of withdrawal. iPago records the time on the order, or on the subscription for a subscription checkout.",
                     "type": "boolean"
                   }
                 },
@@ -2540,7 +2541,16 @@
                       ]
                     },
                     "id": {
-                      "type": "string"
+                      "type": "string",
+                      "description": "The order id for a one-time checkout. For a subscription checkout, the checkout session id; the subscription itself arrives with the subscription.created webhook once the first payment succeeds."
+                    },
+                    "mode": {
+                      "type": "string",
+                      "enum": [
+                        "payment",
+                        "subscription"
+                      ],
+                      "description": "payment charges once. subscription charges the first period now and renews every billing interval."
                     },
                     "client_secret": {
                       "type": "string"
@@ -2564,12 +2574,14 @@
                         "amount",
                         "currency"
                       ],
-                      "additionalProperties": false
+                      "additionalProperties": false,
+                      "description": "What the buyer pays now, VAT included. For a subscription, the first period."
                     }
                   },
                   "required": [
                     "object",
                     "id",
+                    "mode",
                     "client_secret",
                     "status",
                     "total"
@@ -11419,10 +11431,15 @@
                         "created"
                       ],
                       "additionalProperties": false
+                    },
+                    "totp_enrolment_required": {
+                      "type": "boolean",
+                      "description": "True when this deployment requires two-factor authentication and this admin has not turned it on yet. Until they do, other admin routes answer 403 totp_enrolment_required."
                     }
                   },
                   "required": [
-                    "admin"
+                    "admin",
+                    "totp_enrolment_required"
                   ],
                   "additionalProperties": false
                 }
@@ -16917,6 +16934,96 @@
                       "nullable": true,
                       "type": "string"
                     },
+                    "banner_url": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "announcement": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "content_blocks": {
+                      "type": "array",
+                      "items": {
+                        "oneOf": [
+                          {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "type": {
+                                "type": "string",
+                                "enum": [
+                                  "text"
+                                ]
+                              },
+                              "position": {
+                                "type": "string",
+                                "enum": [
+                                  "top",
+                                  "bottom"
+                                ],
+                                "description": "Where the block sits on the storefront home page: above (top) or below (bottom) the product list."
+                              },
+                              "title": {
+                                "type": "string"
+                              },
+                              "body": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "type",
+                              "position"
+                            ],
+                            "additionalProperties": false
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "type": {
+                                "type": "string",
+                                "enum": [
+                                  "image"
+                                ]
+                              },
+                              "position": {
+                                "type": "string",
+                                "enum": [
+                                  "top",
+                                  "bottom"
+                                ],
+                                "description": "Where the block sits on the storefront home page: above (top) or below (bottom) the product list."
+                              },
+                              "title": {
+                                "type": "string"
+                              },
+                              "image_url": {
+                                "type": "string"
+                              },
+                              "alt": {
+                                "type": "string"
+                              },
+                              "link_url": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "type",
+                              "position",
+                              "image_url"
+                            ],
+                            "additionalProperties": false
+                          }
+                        ]
+                      }
+                    },
                     "theme": {
                       "type": "string"
                     },
@@ -17010,6 +17117,9 @@
                     "description",
                     "accent_color",
                     "logo_url",
+                    "banner_url",
+                    "announcement",
+                    "content_blocks",
                     "theme",
                     "appearance",
                     "status",
@@ -17162,6 +17272,106 @@
                       "light"
                     ]
                   },
+                  "announcement": {
+                    "nullable": true,
+                    "type": "string",
+                    "maxLength": 200
+                  },
+                  "content_blocks": {
+                    "description": "The full ordered list; a save replaces it. Send [] to remove every block.",
+                    "maxItems": 12,
+                    "type": "array",
+                    "items": {
+                      "oneOf": [
+                        {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "description": "Keep the id from a previous read to keep the block's identity; omit it on a new block and one is assigned.",
+                              "type": "string",
+                              "maxLength": 32
+                            },
+                            "type": {
+                              "type": "string",
+                              "enum": [
+                                "text"
+                              ]
+                            },
+                            "position": {
+                              "type": "string",
+                              "enum": [
+                                "top",
+                                "bottom"
+                              ],
+                              "description": "Where the block sits on the storefront home page: above (top) or below (bottom) the product list."
+                            },
+                            "title": {
+                              "type": "string",
+                              "maxLength": 120
+                            },
+                            "body": {
+                              "description": "Plain text. A blank line starts a new paragraph.",
+                              "type": "string",
+                              "maxLength": 4000
+                            }
+                          },
+                          "required": [
+                            "type",
+                            "position"
+                          ],
+                          "additionalProperties": false
+                        },
+                        {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "description": "Keep the id from a previous read to keep the block's identity; omit it on a new block and one is assigned.",
+                              "type": "string",
+                              "maxLength": 32
+                            },
+                            "type": {
+                              "type": "string",
+                              "enum": [
+                                "image"
+                              ]
+                            },
+                            "position": {
+                              "type": "string",
+                              "enum": [
+                                "top",
+                                "bottom"
+                              ],
+                              "description": "Where the block sits on the storefront home page: above (top) or below (bottom) the product list."
+                            },
+                            "title": {
+                              "type": "string",
+                              "maxLength": 120
+                            },
+                            "image_url": {
+                              "type": "string",
+                              "maxLength": 2048,
+                              "description": "An https image URL."
+                            },
+                            "alt": {
+                              "type": "string",
+                              "maxLength": 200
+                            },
+                            "link_url": {
+                              "description": "An https URL; when set, the image links to it.",
+                              "type": "string",
+                              "maxLength": 2048
+                            }
+                          },
+                          "required": [
+                            "type",
+                            "position",
+                            "image_url"
+                          ],
+                          "additionalProperties": false
+                        }
+                      ]
+                    }
+                  },
                   "business_name": {
                     "nullable": true,
                     "type": "string",
@@ -17247,6 +17457,96 @@
                     "logo_url": {
                       "nullable": true,
                       "type": "string"
+                    },
+                    "banner_url": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "announcement": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "content_blocks": {
+                      "type": "array",
+                      "items": {
+                        "oneOf": [
+                          {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "type": {
+                                "type": "string",
+                                "enum": [
+                                  "text"
+                                ]
+                              },
+                              "position": {
+                                "type": "string",
+                                "enum": [
+                                  "top",
+                                  "bottom"
+                                ],
+                                "description": "Where the block sits on the storefront home page: above (top) or below (bottom) the product list."
+                              },
+                              "title": {
+                                "type": "string"
+                              },
+                              "body": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "type",
+                              "position"
+                            ],
+                            "additionalProperties": false
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "type": {
+                                "type": "string",
+                                "enum": [
+                                  "image"
+                                ]
+                              },
+                              "position": {
+                                "type": "string",
+                                "enum": [
+                                  "top",
+                                  "bottom"
+                                ],
+                                "description": "Where the block sits on the storefront home page: above (top) or below (bottom) the product list."
+                              },
+                              "title": {
+                                "type": "string"
+                              },
+                              "image_url": {
+                                "type": "string"
+                              },
+                              "alt": {
+                                "type": "string"
+                              },
+                              "link_url": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "type",
+                              "position",
+                              "image_url"
+                            ],
+                            "additionalProperties": false
+                          }
+                        ]
+                      }
                     },
                     "theme": {
                       "type": "string"
@@ -17341,6 +17641,9 @@
                     "description",
                     "accent_color",
                     "logo_url",
+                    "banner_url",
+                    "announcement",
+                    "content_blocks",
                     "theme",
                     "appearance",
                     "status",
@@ -17637,6 +17940,96 @@
                       "nullable": true,
                       "type": "string"
                     },
+                    "banner_url": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "announcement": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "content_blocks": {
+                      "type": "array",
+                      "items": {
+                        "oneOf": [
+                          {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "type": {
+                                "type": "string",
+                                "enum": [
+                                  "text"
+                                ]
+                              },
+                              "position": {
+                                "type": "string",
+                                "enum": [
+                                  "top",
+                                  "bottom"
+                                ],
+                                "description": "Where the block sits on the storefront home page: above (top) or below (bottom) the product list."
+                              },
+                              "title": {
+                                "type": "string"
+                              },
+                              "body": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "type",
+                              "position"
+                            ],
+                            "additionalProperties": false
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "type": {
+                                "type": "string",
+                                "enum": [
+                                  "image"
+                                ]
+                              },
+                              "position": {
+                                "type": "string",
+                                "enum": [
+                                  "top",
+                                  "bottom"
+                                ],
+                                "description": "Where the block sits on the storefront home page: above (top) or below (bottom) the product list."
+                              },
+                              "title": {
+                                "type": "string"
+                              },
+                              "image_url": {
+                                "type": "string"
+                              },
+                              "alt": {
+                                "type": "string"
+                              },
+                              "link_url": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "type",
+                              "position",
+                              "image_url"
+                            ],
+                            "additionalProperties": false
+                          }
+                        ]
+                      }
+                    },
                     "theme": {
                       "type": "string"
                     },
@@ -17730,6 +18123,491 @@
                     "description",
                     "accent_color",
                     "logo_url",
+                    "banner_url",
+                    "announcement",
+                    "content_blocks",
+                    "theme",
+                    "appearance",
+                    "status",
+                    "rejection_reason",
+                    "suspended_reason",
+                    "requires_username",
+                    "username_label",
+                    "tax_behavior",
+                    "platform_fee_bps",
+                    "enabled_payment_methods",
+                    "business_name",
+                    "support_email",
+                    "created"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string"
+                        },
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "param": {
+                          "type": "string"
+                        },
+                        "request_id": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "type",
+                        "code",
+                        "message",
+                        "request_id"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string"
+                        },
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "param": {
+                          "type": "string"
+                        },
+                        "request_id": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "type",
+                        "code",
+                        "message",
+                        "request_id"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string"
+                        },
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "param": {
+                          "type": "string"
+                        },
+                        "request_id": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "type",
+                        "code",
+                        "message",
+                        "request_id"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string"
+                        },
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "param": {
+                          "type": "string"
+                        },
+                        "request_id": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "type",
+                        "code",
+                        "message",
+                        "request_id"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string"
+                        },
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "param": {
+                          "type": "string"
+                        },
+                        "request_id": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "type",
+                        "code",
+                        "message",
+                        "request_id"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/stores/{storeId}/banner": {
+      "post": {
+        "operationId": "uploadStoreBanner",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "storeId",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "object": {
+                      "type": "string",
+                      "enum": [
+                        "store"
+                      ]
+                    },
+                    "id": {
+                      "type": "string"
+                    },
+                    "account": {
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "currency": {
+                      "type": "string"
+                    },
+                    "slug": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "display_name": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "description": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "accent_color": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "logo_url": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "banner_url": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "announcement": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "content_blocks": {
+                      "type": "array",
+                      "items": {
+                        "oneOf": [
+                          {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "type": {
+                                "type": "string",
+                                "enum": [
+                                  "text"
+                                ]
+                              },
+                              "position": {
+                                "type": "string",
+                                "enum": [
+                                  "top",
+                                  "bottom"
+                                ],
+                                "description": "Where the block sits on the storefront home page: above (top) or below (bottom) the product list."
+                              },
+                              "title": {
+                                "type": "string"
+                              },
+                              "body": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "type",
+                              "position"
+                            ],
+                            "additionalProperties": false
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "type": {
+                                "type": "string",
+                                "enum": [
+                                  "image"
+                                ]
+                              },
+                              "position": {
+                                "type": "string",
+                                "enum": [
+                                  "top",
+                                  "bottom"
+                                ],
+                                "description": "Where the block sits on the storefront home page: above (top) or below (bottom) the product list."
+                              },
+                              "title": {
+                                "type": "string"
+                              },
+                              "image_url": {
+                                "type": "string"
+                              },
+                              "alt": {
+                                "type": "string"
+                              },
+                              "link_url": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "type",
+                              "position",
+                              "image_url"
+                            ],
+                            "additionalProperties": false
+                          }
+                        ]
+                      }
+                    },
+                    "theme": {
+                      "type": "string"
+                    },
+                    "appearance": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "draft",
+                        "pending_review",
+                        "live",
+                        "suspended"
+                      ]
+                    },
+                    "rejection_reason": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "suspended_reason": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "requires_username": {
+                      "type": "boolean"
+                    },
+                    "username_label": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "tax_behavior": {
+                      "type": "string",
+                      "enum": [
+                        "inclusive",
+                        "exclusive"
+                      ]
+                    },
+                    "platform_fee_bps": {
+                      "type": "integer",
+                      "minimum": -9007199254740991,
+                      "maximum": 9007199254740991
+                    },
+                    "card_cost": {
+                      "description": "The payment cost taken from what the supplier receives, per payment: bps of the amount the player paid (VAT included) plus a flat amount in minor units. Only on GET /v1/stores/{storeId}.",
+                      "type": "object",
+                      "properties": {
+                        "bps": {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        },
+                        "flat": {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        }
+                      },
+                      "required": [
+                        "bps",
+                        "flat"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "enabled_payment_methods": {
+                      "nullable": true,
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "business_name": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "support_email": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "created": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "object",
+                    "id",
+                    "account",
+                    "name",
+                    "currency",
+                    "slug",
+                    "display_name",
+                    "description",
+                    "accent_color",
+                    "logo_url",
+                    "banner_url",
+                    "announcement",
+                    "content_blocks",
                     "theme",
                     "appearance",
                     "status",
@@ -18238,6 +19116,96 @@
                       "nullable": true,
                       "type": "string"
                     },
+                    "banner_url": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "announcement": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "content_blocks": {
+                      "type": "array",
+                      "items": {
+                        "oneOf": [
+                          {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "type": {
+                                "type": "string",
+                                "enum": [
+                                  "text"
+                                ]
+                              },
+                              "position": {
+                                "type": "string",
+                                "enum": [
+                                  "top",
+                                  "bottom"
+                                ],
+                                "description": "Where the block sits on the storefront home page: above (top) or below (bottom) the product list."
+                              },
+                              "title": {
+                                "type": "string"
+                              },
+                              "body": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "type",
+                              "position"
+                            ],
+                            "additionalProperties": false
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "type": {
+                                "type": "string",
+                                "enum": [
+                                  "image"
+                                ]
+                              },
+                              "position": {
+                                "type": "string",
+                                "enum": [
+                                  "top",
+                                  "bottom"
+                                ],
+                                "description": "Where the block sits on the storefront home page: above (top) or below (bottom) the product list."
+                              },
+                              "title": {
+                                "type": "string"
+                              },
+                              "image_url": {
+                                "type": "string"
+                              },
+                              "alt": {
+                                "type": "string"
+                              },
+                              "link_url": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "type",
+                              "position",
+                              "image_url"
+                            ],
+                            "additionalProperties": false
+                          }
+                        ]
+                      }
+                    },
                     "theme": {
                       "type": "string"
                     },
@@ -18331,6 +19299,9 @@
                     "description",
                     "accent_color",
                     "logo_url",
+                    "banner_url",
+                    "announcement",
+                    "content_blocks",
                     "theme",
                     "appearance",
                     "status",
@@ -19170,6 +20141,96 @@
                       "nullable": true,
                       "type": "string"
                     },
+                    "banner_url": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "announcement": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "content_blocks": {
+                      "type": "array",
+                      "items": {
+                        "oneOf": [
+                          {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "type": {
+                                "type": "string",
+                                "enum": [
+                                  "text"
+                                ]
+                              },
+                              "position": {
+                                "type": "string",
+                                "enum": [
+                                  "top",
+                                  "bottom"
+                                ],
+                                "description": "Where the block sits on the storefront home page: above (top) or below (bottom) the product list."
+                              },
+                              "title": {
+                                "type": "string"
+                              },
+                              "body": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "type",
+                              "position"
+                            ],
+                            "additionalProperties": false
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "type": {
+                                "type": "string",
+                                "enum": [
+                                  "image"
+                                ]
+                              },
+                              "position": {
+                                "type": "string",
+                                "enum": [
+                                  "top",
+                                  "bottom"
+                                ],
+                                "description": "Where the block sits on the storefront home page: above (top) or below (bottom) the product list."
+                              },
+                              "title": {
+                                "type": "string"
+                              },
+                              "image_url": {
+                                "type": "string"
+                              },
+                              "alt": {
+                                "type": "string"
+                              },
+                              "link_url": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "type",
+                              "position",
+                              "image_url"
+                            ],
+                            "additionalProperties": false
+                          }
+                        ]
+                      }
+                    },
                     "theme": {
                       "type": "string"
                     },
@@ -19263,6 +20324,9 @@
                     "description",
                     "accent_color",
                     "logo_url",
+                    "banner_url",
+                    "announcement",
+                    "content_blocks",
                     "theme",
                     "appearance",
                     "status",
@@ -19596,6 +20660,96 @@
                             "nullable": true,
                             "type": "string"
                           },
+                          "banner_url": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "announcement": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "content_blocks": {
+                            "type": "array",
+                            "items": {
+                              "oneOf": [
+                                {
+                                  "type": "object",
+                                  "properties": {
+                                    "id": {
+                                      "type": "string"
+                                    },
+                                    "type": {
+                                      "type": "string",
+                                      "enum": [
+                                        "text"
+                                      ]
+                                    },
+                                    "position": {
+                                      "type": "string",
+                                      "enum": [
+                                        "top",
+                                        "bottom"
+                                      ],
+                                      "description": "Where the block sits on the storefront home page: above (top) or below (bottom) the product list."
+                                    },
+                                    "title": {
+                                      "type": "string"
+                                    },
+                                    "body": {
+                                      "type": "string"
+                                    }
+                                  },
+                                  "required": [
+                                    "id",
+                                    "type",
+                                    "position"
+                                  ],
+                                  "additionalProperties": false
+                                },
+                                {
+                                  "type": "object",
+                                  "properties": {
+                                    "id": {
+                                      "type": "string"
+                                    },
+                                    "type": {
+                                      "type": "string",
+                                      "enum": [
+                                        "image"
+                                      ]
+                                    },
+                                    "position": {
+                                      "type": "string",
+                                      "enum": [
+                                        "top",
+                                        "bottom"
+                                      ],
+                                      "description": "Where the block sits on the storefront home page: above (top) or below (bottom) the product list."
+                                    },
+                                    "title": {
+                                      "type": "string"
+                                    },
+                                    "image_url": {
+                                      "type": "string"
+                                    },
+                                    "alt": {
+                                      "type": "string"
+                                    },
+                                    "link_url": {
+                                      "type": "string"
+                                    }
+                                  },
+                                  "required": [
+                                    "id",
+                                    "type",
+                                    "position",
+                                    "image_url"
+                                  ],
+                                  "additionalProperties": false
+                                }
+                              ]
+                            }
+                          },
                           "theme": {
                             "type": "string"
                           },
@@ -19707,6 +20861,9 @@
                           "description",
                           "accent_color",
                           "logo_url",
+                          "banner_url",
+                          "announcement",
+                          "content_blocks",
                           "theme",
                           "appearance",
                           "status",
@@ -19844,6 +21001,96 @@
                       "nullable": true,
                       "type": "string"
                     },
+                    "banner_url": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "announcement": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "content_blocks": {
+                      "type": "array",
+                      "items": {
+                        "oneOf": [
+                          {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "type": {
+                                "type": "string",
+                                "enum": [
+                                  "text"
+                                ]
+                              },
+                              "position": {
+                                "type": "string",
+                                "enum": [
+                                  "top",
+                                  "bottom"
+                                ],
+                                "description": "Where the block sits on the storefront home page: above (top) or below (bottom) the product list."
+                              },
+                              "title": {
+                                "type": "string"
+                              },
+                              "body": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "type",
+                              "position"
+                            ],
+                            "additionalProperties": false
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "type": {
+                                "type": "string",
+                                "enum": [
+                                  "image"
+                                ]
+                              },
+                              "position": {
+                                "type": "string",
+                                "enum": [
+                                  "top",
+                                  "bottom"
+                                ],
+                                "description": "Where the block sits on the storefront home page: above (top) or below (bottom) the product list."
+                              },
+                              "title": {
+                                "type": "string"
+                              },
+                              "image_url": {
+                                "type": "string"
+                              },
+                              "alt": {
+                                "type": "string"
+                              },
+                              "link_url": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "type",
+                              "position",
+                              "image_url"
+                            ],
+                            "additionalProperties": false
+                          }
+                        ]
+                      }
+                    },
                     "theme": {
                       "type": "string"
                     },
@@ -19955,6 +21202,9 @@
                     "description",
                     "accent_color",
                     "logo_url",
+                    "banner_url",
+                    "announcement",
+                    "content_blocks",
                     "theme",
                     "appearance",
                     "status",
@@ -20394,6 +21644,96 @@
                       "nullable": true,
                       "type": "string"
                     },
+                    "banner_url": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "announcement": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "content_blocks": {
+                      "type": "array",
+                      "items": {
+                        "oneOf": [
+                          {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "type": {
+                                "type": "string",
+                                "enum": [
+                                  "text"
+                                ]
+                              },
+                              "position": {
+                                "type": "string",
+                                "enum": [
+                                  "top",
+                                  "bottom"
+                                ],
+                                "description": "Where the block sits on the storefront home page: above (top) or below (bottom) the product list."
+                              },
+                              "title": {
+                                "type": "string"
+                              },
+                              "body": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "type",
+                              "position"
+                            ],
+                            "additionalProperties": false
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "type": {
+                                "type": "string",
+                                "enum": [
+                                  "image"
+                                ]
+                              },
+                              "position": {
+                                "type": "string",
+                                "enum": [
+                                  "top",
+                                  "bottom"
+                                ],
+                                "description": "Where the block sits on the storefront home page: above (top) or below (bottom) the product list."
+                              },
+                              "title": {
+                                "type": "string"
+                              },
+                              "image_url": {
+                                "type": "string"
+                              },
+                              "alt": {
+                                "type": "string"
+                              },
+                              "link_url": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "type",
+                              "position",
+                              "image_url"
+                            ],
+                            "additionalProperties": false
+                          }
+                        ]
+                      }
+                    },
                     "theme": {
                       "type": "string"
                     },
@@ -20487,6 +21827,9 @@
                     "description",
                     "accent_color",
                     "logo_url",
+                    "banner_url",
+                    "announcement",
+                    "content_blocks",
                     "theme",
                     "appearance",
                     "status",
@@ -20723,6 +22066,96 @@
                       "nullable": true,
                       "type": "string"
                     },
+                    "banner_url": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "announcement": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "content_blocks": {
+                      "type": "array",
+                      "items": {
+                        "oneOf": [
+                          {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "type": {
+                                "type": "string",
+                                "enum": [
+                                  "text"
+                                ]
+                              },
+                              "position": {
+                                "type": "string",
+                                "enum": [
+                                  "top",
+                                  "bottom"
+                                ],
+                                "description": "Where the block sits on the storefront home page: above (top) or below (bottom) the product list."
+                              },
+                              "title": {
+                                "type": "string"
+                              },
+                              "body": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "type",
+                              "position"
+                            ],
+                            "additionalProperties": false
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "type": {
+                                "type": "string",
+                                "enum": [
+                                  "image"
+                                ]
+                              },
+                              "position": {
+                                "type": "string",
+                                "enum": [
+                                  "top",
+                                  "bottom"
+                                ],
+                                "description": "Where the block sits on the storefront home page: above (top) or below (bottom) the product list."
+                              },
+                              "title": {
+                                "type": "string"
+                              },
+                              "image_url": {
+                                "type": "string"
+                              },
+                              "alt": {
+                                "type": "string"
+                              },
+                              "link_url": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "type",
+                              "position",
+                              "image_url"
+                            ],
+                            "additionalProperties": false
+                          }
+                        ]
+                      }
+                    },
                     "theme": {
                       "type": "string"
                     },
@@ -20816,6 +22249,9 @@
                     "description",
                     "accent_color",
                     "logo_url",
+                    "banner_url",
+                    "announcement",
+                    "content_blocks",
                     "theme",
                     "appearance",
                     "status",
@@ -21089,6 +22525,96 @@
                       "nullable": true,
                       "type": "string"
                     },
+                    "banner_url": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "announcement": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "content_blocks": {
+                      "type": "array",
+                      "items": {
+                        "oneOf": [
+                          {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "type": {
+                                "type": "string",
+                                "enum": [
+                                  "text"
+                                ]
+                              },
+                              "position": {
+                                "type": "string",
+                                "enum": [
+                                  "top",
+                                  "bottom"
+                                ],
+                                "description": "Where the block sits on the storefront home page: above (top) or below (bottom) the product list."
+                              },
+                              "title": {
+                                "type": "string"
+                              },
+                              "body": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "type",
+                              "position"
+                            ],
+                            "additionalProperties": false
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "type": {
+                                "type": "string",
+                                "enum": [
+                                  "image"
+                                ]
+                              },
+                              "position": {
+                                "type": "string",
+                                "enum": [
+                                  "top",
+                                  "bottom"
+                                ],
+                                "description": "Where the block sits on the storefront home page: above (top) or below (bottom) the product list."
+                              },
+                              "title": {
+                                "type": "string"
+                              },
+                              "image_url": {
+                                "type": "string"
+                              },
+                              "alt": {
+                                "type": "string"
+                              },
+                              "link_url": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "type",
+                              "position",
+                              "image_url"
+                            ],
+                            "additionalProperties": false
+                          }
+                        ]
+                      }
+                    },
                     "theme": {
                       "type": "string"
                     },
@@ -21182,6 +22708,9 @@
                     "description",
                     "accent_color",
                     "logo_url",
+                    "banner_url",
+                    "announcement",
+                    "content_blocks",
                     "theme",
                     "appearance",
                     "status",
@@ -21412,6 +22941,96 @@
                       "nullable": true,
                       "type": "string"
                     },
+                    "banner_url": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "announcement": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "content_blocks": {
+                      "type": "array",
+                      "items": {
+                        "oneOf": [
+                          {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "type": {
+                                "type": "string",
+                                "enum": [
+                                  "text"
+                                ]
+                              },
+                              "position": {
+                                "type": "string",
+                                "enum": [
+                                  "top",
+                                  "bottom"
+                                ],
+                                "description": "Where the block sits on the storefront home page: above (top) or below (bottom) the product list."
+                              },
+                              "title": {
+                                "type": "string"
+                              },
+                              "body": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "type",
+                              "position"
+                            ],
+                            "additionalProperties": false
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "type": {
+                                "type": "string",
+                                "enum": [
+                                  "image"
+                                ]
+                              },
+                              "position": {
+                                "type": "string",
+                                "enum": [
+                                  "top",
+                                  "bottom"
+                                ],
+                                "description": "Where the block sits on the storefront home page: above (top) or below (bottom) the product list."
+                              },
+                              "title": {
+                                "type": "string"
+                              },
+                              "image_url": {
+                                "type": "string"
+                              },
+                              "alt": {
+                                "type": "string"
+                              },
+                              "link_url": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "type",
+                              "position",
+                              "image_url"
+                            ],
+                            "additionalProperties": false
+                          }
+                        ]
+                      }
+                    },
                     "theme": {
                       "type": "string"
                     },
@@ -21505,6 +23124,9 @@
                     "description",
                     "accent_color",
                     "logo_url",
+                    "banner_url",
+                    "announcement",
+                    "content_blocks",
                     "theme",
                     "appearance",
                     "status",
@@ -21758,6 +23380,96 @@
                       "nullable": true,
                       "type": "string"
                     },
+                    "banner_url": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "announcement": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "content_blocks": {
+                      "type": "array",
+                      "items": {
+                        "oneOf": [
+                          {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "type": {
+                                "type": "string",
+                                "enum": [
+                                  "text"
+                                ]
+                              },
+                              "position": {
+                                "type": "string",
+                                "enum": [
+                                  "top",
+                                  "bottom"
+                                ],
+                                "description": "Where the block sits on the storefront home page: above (top) or below (bottom) the product list."
+                              },
+                              "title": {
+                                "type": "string"
+                              },
+                              "body": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "type",
+                              "position"
+                            ],
+                            "additionalProperties": false
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "type": {
+                                "type": "string",
+                                "enum": [
+                                  "image"
+                                ]
+                              },
+                              "position": {
+                                "type": "string",
+                                "enum": [
+                                  "top",
+                                  "bottom"
+                                ],
+                                "description": "Where the block sits on the storefront home page: above (top) or below (bottom) the product list."
+                              },
+                              "title": {
+                                "type": "string"
+                              },
+                              "image_url": {
+                                "type": "string"
+                              },
+                              "alt": {
+                                "type": "string"
+                              },
+                              "link_url": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "type",
+                              "position",
+                              "image_url"
+                            ],
+                            "additionalProperties": false
+                          }
+                        ]
+                      }
+                    },
                     "theme": {
                       "type": "string"
                     },
@@ -21851,6 +23563,9 @@
                     "description",
                     "accent_color",
                     "logo_url",
+                    "banner_url",
+                    "announcement",
+                    "content_blocks",
                     "theme",
                     "appearance",
                     "status",
@@ -29304,7 +31019,8 @@
                             "type": "string",
                             "enum": [
                               "plugin",
-                              "rcon"
+                              "rcon",
+                              "webrcon"
                             ]
                           },
                           "masked": {
@@ -29521,7 +31237,8 @@
                     "type": "string",
                     "enum": [
                       "plugin",
-                      "rcon"
+                      "rcon",
+                      "webrcon"
                     ]
                   },
                   "rcon": {
@@ -29607,7 +31324,8 @@
                       "type": "string",
                       "enum": [
                         "plugin",
-                        "rcon"
+                        "rcon",
+                        "webrcon"
                       ]
                     },
                     "masked": {
@@ -29952,6 +31670,14 @@
                     "type": "string",
                     "minLength": 1,
                     "maxLength": 512
+                  },
+                  "transport": {
+                    "default": "rcon",
+                    "type": "string",
+                    "enum": [
+                      "rcon",
+                      "webrcon"
+                    ]
                   }
                 },
                 "required": [
@@ -30229,6 +31955,13 @@
                     "minLength": 1,
                     "maxLength": 255
                   },
+                  "transport": {
+                    "type": "string",
+                    "enum": [
+                      "rcon",
+                      "webrcon"
+                    ]
+                  },
                   "rcon": {
                     "type": "object",
                     "properties": {
@@ -30312,7 +32045,8 @@
                       "type": "string",
                       "enum": [
                         "plugin",
-                        "rcon"
+                        "rcon",
+                        "webrcon"
                       ]
                     },
                     "masked": {
@@ -30687,7 +32421,8 @@
                       "type": "string",
                       "enum": [
                         "plugin",
-                        "rcon"
+                        "rcon",
+                        "webrcon"
                       ]
                     },
                     "masked": {
@@ -30978,7 +32713,8 @@
                       "type": "string",
                       "enum": [
                         "plugin",
-                        "rcon"
+                        "rcon",
+                        "webrcon"
                       ]
                     },
                     "masked": {
@@ -35351,6 +37087,96 @@
                       "nullable": true,
                       "type": "string"
                     },
+                    "banner_url": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "announcement": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "content_blocks": {
+                      "type": "array",
+                      "items": {
+                        "oneOf": [
+                          {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "type": {
+                                "type": "string",
+                                "enum": [
+                                  "text"
+                                ]
+                              },
+                              "position": {
+                                "type": "string",
+                                "enum": [
+                                  "top",
+                                  "bottom"
+                                ],
+                                "description": "Where the block sits on the storefront home page: above (top) or below (bottom) the product list."
+                              },
+                              "title": {
+                                "type": "string"
+                              },
+                              "body": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "type",
+                              "position"
+                            ],
+                            "additionalProperties": false
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "type": {
+                                "type": "string",
+                                "enum": [
+                                  "image"
+                                ]
+                              },
+                              "position": {
+                                "type": "string",
+                                "enum": [
+                                  "top",
+                                  "bottom"
+                                ],
+                                "description": "Where the block sits on the storefront home page: above (top) or below (bottom) the product list."
+                              },
+                              "title": {
+                                "type": "string"
+                              },
+                              "image_url": {
+                                "type": "string"
+                              },
+                              "alt": {
+                                "type": "string"
+                              },
+                              "link_url": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "type",
+                              "position",
+                              "image_url"
+                            ],
+                            "additionalProperties": false
+                          }
+                        ]
+                      }
+                    },
                     "theme": {
                       "type": "string"
                     },
@@ -35444,6 +37270,9 @@
                     "description",
                     "accent_color",
                     "logo_url",
+                    "banner_url",
+                    "announcement",
+                    "content_blocks",
                     "theme",
                     "appearance",
                     "status",
@@ -41128,6 +42957,96 @@
                       "nullable": true,
                       "type": "string"
                     },
+                    "banner_url": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "announcement": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "content_blocks": {
+                      "type": "array",
+                      "items": {
+                        "oneOf": [
+                          {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "type": {
+                                "type": "string",
+                                "enum": [
+                                  "text"
+                                ]
+                              },
+                              "position": {
+                                "type": "string",
+                                "enum": [
+                                  "top",
+                                  "bottom"
+                                ],
+                                "description": "Where the block sits on the storefront home page: above (top) or below (bottom) the product list."
+                              },
+                              "title": {
+                                "type": "string"
+                              },
+                              "body": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "type",
+                              "position"
+                            ],
+                            "additionalProperties": false
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "type": {
+                                "type": "string",
+                                "enum": [
+                                  "image"
+                                ]
+                              },
+                              "position": {
+                                "type": "string",
+                                "enum": [
+                                  "top",
+                                  "bottom"
+                                ],
+                                "description": "Where the block sits on the storefront home page: above (top) or below (bottom) the product list."
+                              },
+                              "title": {
+                                "type": "string"
+                              },
+                              "image_url": {
+                                "type": "string"
+                              },
+                              "alt": {
+                                "type": "string"
+                              },
+                              "link_url": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "type",
+                              "position",
+                              "image_url"
+                            ],
+                            "additionalProperties": false
+                          }
+                        ]
+                      }
+                    },
                     "theme": {
                       "type": "string"
                     },
@@ -41191,6 +43110,9 @@
                     "description",
                     "accent_color",
                     "logo_url",
+                    "banner_url",
+                    "announcement",
+                    "content_blocks",
                     "theme",
                     "appearance",
                     "payment_methods",
@@ -45389,7 +47311,16 @@
                       ]
                     },
                     "id": {
-                      "type": "string"
+                      "type": "string",
+                      "description": "The order id for a one-time checkout. For a subscription checkout, the checkout session id; the subscription itself arrives with the subscription.created webhook once the first payment succeeds."
+                    },
+                    "mode": {
+                      "type": "string",
+                      "enum": [
+                        "payment",
+                        "subscription"
+                      ],
+                      "description": "payment charges once. subscription charges the first period now and renews every billing interval."
                     },
                     "client_secret": {
                       "type": "string"
@@ -45413,12 +47344,14 @@
                         "amount",
                         "currency"
                       ],
-                      "additionalProperties": false
+                      "additionalProperties": false,
+                      "description": "What the buyer pays now, VAT included. For a subscription, the first period."
                     }
                   },
                   "required": [
                     "object",
                     "id",
+                    "mode",
                     "client_secret",
                     "status",
                     "total"

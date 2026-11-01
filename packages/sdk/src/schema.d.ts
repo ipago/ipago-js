@@ -1293,6 +1293,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/stores/{storeId}/banner": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["uploadStoreBanner"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/stores/{storeId}/payment-methods": {
         parameters: {
             query?: never;
@@ -3958,6 +3974,7 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": {
+                    /** @description One-time products in any number, or a single subscription product with quantity 1. */
                     items: {
                         product: string;
                         quantity?: number;
@@ -3966,7 +3983,7 @@ export interface operations {
                     return_url?: string;
                     delivery_target?: string;
                     country?: string;
-                    /** @description Pass true once your checkout has asked the buyer to agree to immediate delivery and to losing the 14-day right of withdrawal. iPago records the time on the order. */
+                    /** @description Pass true once your checkout has asked the buyer to agree to immediate delivery and to losing the 14-day right of withdrawal. iPago records the time on the order, or on the subscription for a subscription checkout. */
                     withdrawal_waiver?: boolean;
                 };
             };
@@ -3981,9 +3998,16 @@ export interface operations {
                     "application/json": {
                         /** @enum {string} */
                         object: "checkout";
+                        /** @description The order id for a one-time checkout. For a subscription checkout, the checkout session id; the subscription itself arrives with the subscription.created webhook once the first payment succeeds. */
                         id: string;
+                        /**
+                         * @description payment charges once. subscription charges the first period now and renews every billing interval.
+                         * @enum {string}
+                         */
+                        mode: "payment" | "subscription";
                         client_secret: string;
                         status: string;
+                        /** @description What the buyer pays now, VAT included. For a subscription, the first period. */
                         total: {
                             amount: number;
                             currency: string;
@@ -7510,6 +7534,8 @@ export interface operations {
                             role: string;
                             created: string;
                         };
+                        /** @description True when this deployment requires two-factor authentication and this admin has not turned it on yet. Until they do, other admin routes answer 403 totp_enrolment_required. */
+                        totp_enrolment_required: boolean;
                     };
                 };
             };
@@ -9316,6 +9342,33 @@ export interface operations {
                         description: string | null;
                         accent_color: string | null;
                         logo_url: string | null;
+                        banner_url: string | null;
+                        announcement: string | null;
+                        content_blocks: ({
+                            id: string;
+                            /** @enum {string} */
+                            type: "text";
+                            /**
+                             * @description Where the block sits on the storefront home page: above (top) or below (bottom) the product list.
+                             * @enum {string}
+                             */
+                            position: "top" | "bottom";
+                            title?: string;
+                            body?: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            type: "image";
+                            /**
+                             * @description Where the block sits on the storefront home page: above (top) or below (bottom) the product list.
+                             * @enum {string}
+                             */
+                            position: "top" | "bottom";
+                            title?: string;
+                            image_url: string;
+                            alt?: string;
+                            link_url?: string;
+                        })[];
                         theme: string;
                         appearance: string;
                         /** @enum {string} */
@@ -9395,6 +9448,38 @@ export interface operations {
                     theme?: "classic" | "sidebar" | "showcase";
                     /** @enum {string} */
                     appearance?: "dark" | "light";
+                    announcement?: string | null;
+                    /** @description The full ordered list; a save replaces it. Send [] to remove every block. */
+                    content_blocks?: ({
+                        /** @description Keep the id from a previous read to keep the block's identity; omit it on a new block and one is assigned. */
+                        id?: string;
+                        /** @enum {string} */
+                        type: "text";
+                        /**
+                         * @description Where the block sits on the storefront home page: above (top) or below (bottom) the product list.
+                         * @enum {string}
+                         */
+                        position: "top" | "bottom";
+                        title?: string;
+                        /** @description Plain text. A blank line starts a new paragraph. */
+                        body?: string;
+                    } | {
+                        /** @description Keep the id from a previous read to keep the block's identity; omit it on a new block and one is assigned. */
+                        id?: string;
+                        /** @enum {string} */
+                        type: "image";
+                        /**
+                         * @description Where the block sits on the storefront home page: above (top) or below (bottom) the product list.
+                         * @enum {string}
+                         */
+                        position: "top" | "bottom";
+                        title?: string;
+                        /** @description An https image URL. */
+                        image_url: string;
+                        alt?: string;
+                        /** @description An https URL; when set, the image links to it. */
+                        link_url?: string;
+                    })[];
                     business_name?: string | null;
                     support_email?: string | null;
                     requires_username?: boolean;
@@ -9423,6 +9508,33 @@ export interface operations {
                         description: string | null;
                         accent_color: string | null;
                         logo_url: string | null;
+                        banner_url: string | null;
+                        announcement: string | null;
+                        content_blocks: ({
+                            id: string;
+                            /** @enum {string} */
+                            type: "text";
+                            /**
+                             * @description Where the block sits on the storefront home page: above (top) or below (bottom) the product list.
+                             * @enum {string}
+                             */
+                            position: "top" | "bottom";
+                            title?: string;
+                            body?: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            type: "image";
+                            /**
+                             * @description Where the block sits on the storefront home page: above (top) or below (bottom) the product list.
+                             * @enum {string}
+                             */
+                            position: "top" | "bottom";
+                            title?: string;
+                            image_url: string;
+                            alt?: string;
+                            link_url?: string;
+                        })[];
                         theme: string;
                         appearance: string;
                         /** @enum {string} */
@@ -9562,6 +9674,199 @@ export interface operations {
                         description: string | null;
                         accent_color: string | null;
                         logo_url: string | null;
+                        banner_url: string | null;
+                        announcement: string | null;
+                        content_blocks: ({
+                            id: string;
+                            /** @enum {string} */
+                            type: "text";
+                            /**
+                             * @description Where the block sits on the storefront home page: above (top) or below (bottom) the product list.
+                             * @enum {string}
+                             */
+                            position: "top" | "bottom";
+                            title?: string;
+                            body?: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            type: "image";
+                            /**
+                             * @description Where the block sits on the storefront home page: above (top) or below (bottom) the product list.
+                             * @enum {string}
+                             */
+                            position: "top" | "bottom";
+                            title?: string;
+                            image_url: string;
+                            alt?: string;
+                            link_url?: string;
+                        })[];
+                        theme: string;
+                        appearance: string;
+                        /** @enum {string} */
+                        status: "draft" | "pending_review" | "live" | "suspended";
+                        rejection_reason: string | null;
+                        suspended_reason: string | null;
+                        requires_username: boolean;
+                        username_label: string | null;
+                        /** @enum {string} */
+                        tax_behavior: "inclusive" | "exclusive";
+                        platform_fee_bps: number;
+                        /** @description The payment cost taken from what the supplier receives, per payment: bps of the amount the player paid (VAT included) plus a flat amount in minor units. Only on GET /v1/stores/{storeId}. */
+                        card_cost?: {
+                            bps: number;
+                            flat: number;
+                        };
+                        enabled_payment_methods: string[] | null;
+                        business_name: string | null;
+                        support_email: string | null;
+                        created: string;
+                    };
+                };
+            };
+            /** @description Default Response */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+            /** @description Default Response */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+            /** @description Default Response */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+            /** @description Default Response */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+            /** @description Default Response */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    uploadStoreBanner: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                storeId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @enum {string} */
+                        object: "store";
+                        id: string;
+                        account: string;
+                        name: string;
+                        currency: string;
+                        slug: string | null;
+                        display_name: string | null;
+                        description: string | null;
+                        accent_color: string | null;
+                        logo_url: string | null;
+                        banner_url: string | null;
+                        announcement: string | null;
+                        content_blocks: ({
+                            id: string;
+                            /** @enum {string} */
+                            type: "text";
+                            /**
+                             * @description Where the block sits on the storefront home page: above (top) or below (bottom) the product list.
+                             * @enum {string}
+                             */
+                            position: "top" | "bottom";
+                            title?: string;
+                            body?: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            type: "image";
+                            /**
+                             * @description Where the block sits on the storefront home page: above (top) or below (bottom) the product list.
+                             * @enum {string}
+                             */
+                            position: "top" | "bottom";
+                            title?: string;
+                            image_url: string;
+                            alt?: string;
+                            link_url?: string;
+                        })[];
                         theme: string;
                         appearance: string;
                         /** @enum {string} */
@@ -9787,6 +10092,33 @@ export interface operations {
                         description: string | null;
                         accent_color: string | null;
                         logo_url: string | null;
+                        banner_url: string | null;
+                        announcement: string | null;
+                        content_blocks: ({
+                            id: string;
+                            /** @enum {string} */
+                            type: "text";
+                            /**
+                             * @description Where the block sits on the storefront home page: above (top) or below (bottom) the product list.
+                             * @enum {string}
+                             */
+                            position: "top" | "bottom";
+                            title?: string;
+                            body?: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            type: "image";
+                            /**
+                             * @description Where the block sits on the storefront home page: above (top) or below (bottom) the product list.
+                             * @enum {string}
+                             */
+                            position: "top" | "bottom";
+                            title?: string;
+                            image_url: string;
+                            alt?: string;
+                            link_url?: string;
+                        })[];
                         theme: string;
                         appearance: string;
                         /** @enum {string} */
@@ -10130,6 +10462,33 @@ export interface operations {
                         description: string | null;
                         accent_color: string | null;
                         logo_url: string | null;
+                        banner_url: string | null;
+                        announcement: string | null;
+                        content_blocks: ({
+                            id: string;
+                            /** @enum {string} */
+                            type: "text";
+                            /**
+                             * @description Where the block sits on the storefront home page: above (top) or below (bottom) the product list.
+                             * @enum {string}
+                             */
+                            position: "top" | "bottom";
+                            title?: string;
+                            body?: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            type: "image";
+                            /**
+                             * @description Where the block sits on the storefront home page: above (top) or below (bottom) the product list.
+                             * @enum {string}
+                             */
+                            position: "top" | "bottom";
+                            title?: string;
+                            image_url: string;
+                            alt?: string;
+                            link_url?: string;
+                        })[];
                         theme: string;
                         appearance: string;
                         /** @enum {string} */
@@ -10275,6 +10634,33 @@ export interface operations {
                             description: string | null;
                             accent_color: string | null;
                             logo_url: string | null;
+                            banner_url: string | null;
+                            announcement: string | null;
+                            content_blocks: ({
+                                id: string;
+                                /** @enum {string} */
+                                type: "text";
+                                /**
+                                 * @description Where the block sits on the storefront home page: above (top) or below (bottom) the product list.
+                                 * @enum {string}
+                                 */
+                                position: "top" | "bottom";
+                                title?: string;
+                                body?: string;
+                            } | {
+                                id: string;
+                                /** @enum {string} */
+                                type: "image";
+                                /**
+                                 * @description Where the block sits on the storefront home page: above (top) or below (bottom) the product list.
+                                 * @enum {string}
+                                 */
+                                position: "top" | "bottom";
+                                title?: string;
+                                image_url: string;
+                                alt?: string;
+                                link_url?: string;
+                            })[];
                             theme: string;
                             appearance: string;
                             /** @enum {string} */
@@ -10352,6 +10738,33 @@ export interface operations {
                         description: string | null;
                         accent_color: string | null;
                         logo_url: string | null;
+                        banner_url: string | null;
+                        announcement: string | null;
+                        content_blocks: ({
+                            id: string;
+                            /** @enum {string} */
+                            type: "text";
+                            /**
+                             * @description Where the block sits on the storefront home page: above (top) or below (bottom) the product list.
+                             * @enum {string}
+                             */
+                            position: "top" | "bottom";
+                            title?: string;
+                            body?: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            type: "image";
+                            /**
+                             * @description Where the block sits on the storefront home page: above (top) or below (bottom) the product list.
+                             * @enum {string}
+                             */
+                            position: "top" | "bottom";
+                            title?: string;
+                            image_url: string;
+                            alt?: string;
+                            link_url?: string;
+                        })[];
                         theme: string;
                         appearance: string;
                         /** @enum {string} */
@@ -10532,6 +10945,33 @@ export interface operations {
                         description: string | null;
                         accent_color: string | null;
                         logo_url: string | null;
+                        banner_url: string | null;
+                        announcement: string | null;
+                        content_blocks: ({
+                            id: string;
+                            /** @enum {string} */
+                            type: "text";
+                            /**
+                             * @description Where the block sits on the storefront home page: above (top) or below (bottom) the product list.
+                             * @enum {string}
+                             */
+                            position: "top" | "bottom";
+                            title?: string;
+                            body?: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            type: "image";
+                            /**
+                             * @description Where the block sits on the storefront home page: above (top) or below (bottom) the product list.
+                             * @enum {string}
+                             */
+                            position: "top" | "bottom";
+                            title?: string;
+                            image_url: string;
+                            alt?: string;
+                            link_url?: string;
+                        })[];
                         theme: string;
                         appearance: string;
                         /** @enum {string} */
@@ -10644,6 +11084,33 @@ export interface operations {
                         description: string | null;
                         accent_color: string | null;
                         logo_url: string | null;
+                        banner_url: string | null;
+                        announcement: string | null;
+                        content_blocks: ({
+                            id: string;
+                            /** @enum {string} */
+                            type: "text";
+                            /**
+                             * @description Where the block sits on the storefront home page: above (top) or below (bottom) the product list.
+                             * @enum {string}
+                             */
+                            position: "top" | "bottom";
+                            title?: string;
+                            body?: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            type: "image";
+                            /**
+                             * @description Where the block sits on the storefront home page: above (top) or below (bottom) the product list.
+                             * @enum {string}
+                             */
+                            position: "top" | "bottom";
+                            title?: string;
+                            image_url: string;
+                            alt?: string;
+                            link_url?: string;
+                        })[];
                         theme: string;
                         appearance: string;
                         /** @enum {string} */
@@ -10772,6 +11239,33 @@ export interface operations {
                         description: string | null;
                         accent_color: string | null;
                         logo_url: string | null;
+                        banner_url: string | null;
+                        announcement: string | null;
+                        content_blocks: ({
+                            id: string;
+                            /** @enum {string} */
+                            type: "text";
+                            /**
+                             * @description Where the block sits on the storefront home page: above (top) or below (bottom) the product list.
+                             * @enum {string}
+                             */
+                            position: "top" | "bottom";
+                            title?: string;
+                            body?: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            type: "image";
+                            /**
+                             * @description Where the block sits on the storefront home page: above (top) or below (bottom) the product list.
+                             * @enum {string}
+                             */
+                            position: "top" | "bottom";
+                            title?: string;
+                            image_url: string;
+                            alt?: string;
+                            link_url?: string;
+                        })[];
                         theme: string;
                         appearance: string;
                         /** @enum {string} */
@@ -10883,6 +11377,33 @@ export interface operations {
                         description: string | null;
                         accent_color: string | null;
                         logo_url: string | null;
+                        banner_url: string | null;
+                        announcement: string | null;
+                        content_blocks: ({
+                            id: string;
+                            /** @enum {string} */
+                            type: "text";
+                            /**
+                             * @description Where the block sits on the storefront home page: above (top) or below (bottom) the product list.
+                             * @enum {string}
+                             */
+                            position: "top" | "bottom";
+                            title?: string;
+                            body?: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            type: "image";
+                            /**
+                             * @description Where the block sits on the storefront home page: above (top) or below (bottom) the product list.
+                             * @enum {string}
+                             */
+                            position: "top" | "bottom";
+                            title?: string;
+                            image_url: string;
+                            alt?: string;
+                            link_url?: string;
+                        })[];
                         theme: string;
                         appearance: string;
                         /** @enum {string} */
@@ -11005,6 +11526,33 @@ export interface operations {
                         description: string | null;
                         accent_color: string | null;
                         logo_url: string | null;
+                        banner_url: string | null;
+                        announcement: string | null;
+                        content_blocks: ({
+                            id: string;
+                            /** @enum {string} */
+                            type: "text";
+                            /**
+                             * @description Where the block sits on the storefront home page: above (top) or below (bottom) the product list.
+                             * @enum {string}
+                             */
+                            position: "top" | "bottom";
+                            title?: string;
+                            body?: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            type: "image";
+                            /**
+                             * @description Where the block sits on the storefront home page: above (top) or below (bottom) the product list.
+                             * @enum {string}
+                             */
+                            position: "top" | "bottom";
+                            title?: string;
+                            image_url: string;
+                            alt?: string;
+                            link_url?: string;
+                        })[];
                         theme: string;
                         appearance: string;
                         /** @enum {string} */
@@ -13762,7 +14310,7 @@ export interface operations {
                             name: string;
                             mode: string;
                             /** @enum {string} */
-                            transport: "plugin" | "rcon";
+                            transport: "plugin" | "rcon" | "webrcon";
                             masked: string | null;
                             rcon: {
                                 host: string;
@@ -13848,7 +14396,7 @@ export interface operations {
                      * @default plugin
                      * @enum {string}
                      */
-                    transport?: "plugin" | "rcon";
+                    transport?: "plugin" | "rcon" | "webrcon";
                     rcon?: {
                         host: string;
                         port: number;
@@ -13871,7 +14419,7 @@ export interface operations {
                         name: string;
                         mode: string;
                         /** @enum {string} */
-                        transport: "plugin" | "rcon";
+                        transport: "plugin" | "rcon" | "webrcon";
                         masked: string | null;
                         rcon: {
                             host: string;
@@ -14005,6 +14553,11 @@ export interface operations {
                     host: string;
                     port: number;
                     password: string;
+                    /**
+                     * @default rcon
+                     * @enum {string}
+                     */
+                    transport?: "rcon" | "webrcon";
                 };
             };
         };
@@ -14124,7 +14677,7 @@ export interface operations {
                         name: string;
                         mode: string;
                         /** @enum {string} */
-                        transport: "plugin" | "rcon";
+                        transport: "plugin" | "rcon" | "webrcon";
                         masked: string | null;
                         rcon: {
                             host: string;
@@ -14222,6 +14775,8 @@ export interface operations {
             content: {
                 "application/json": {
                     name?: string;
+                    /** @enum {string} */
+                    transport?: "rcon" | "webrcon";
                     rcon?: {
                         host?: string;
                         port?: number;
@@ -14244,7 +14799,7 @@ export interface operations {
                         name: string;
                         mode: string;
                         /** @enum {string} */
-                        transport: "plugin" | "rcon";
+                        transport: "plugin" | "rcon" | "webrcon";
                         masked: string | null;
                         rcon: {
                             host: string;
@@ -14387,7 +14942,7 @@ export interface operations {
                         name: string;
                         mode: string;
                         /** @enum {string} */
-                        transport: "plugin" | "rcon";
+                        transport: "plugin" | "rcon" | "webrcon";
                         masked: string | null;
                         rcon: {
                             host: string;
@@ -15998,6 +16553,33 @@ export interface operations {
                         description: string | null;
                         accent_color: string | null;
                         logo_url: string | null;
+                        banner_url: string | null;
+                        announcement: string | null;
+                        content_blocks: ({
+                            id: string;
+                            /** @enum {string} */
+                            type: "text";
+                            /**
+                             * @description Where the block sits on the storefront home page: above (top) or below (bottom) the product list.
+                             * @enum {string}
+                             */
+                            position: "top" | "bottom";
+                            title?: string;
+                            body?: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            type: "image";
+                            /**
+                             * @description Where the block sits on the storefront home page: above (top) or below (bottom) the product list.
+                             * @enum {string}
+                             */
+                            position: "top" | "bottom";
+                            title?: string;
+                            image_url: string;
+                            alt?: string;
+                            link_url?: string;
+                        })[];
                         theme: string;
                         appearance: string;
                         /** @enum {string} */
@@ -18216,6 +18798,33 @@ export interface operations {
                         description: string | null;
                         accent_color: string | null;
                         logo_url: string | null;
+                        banner_url: string | null;
+                        announcement: string | null;
+                        content_blocks: ({
+                            id: string;
+                            /** @enum {string} */
+                            type: "text";
+                            /**
+                             * @description Where the block sits on the storefront home page: above (top) or below (bottom) the product list.
+                             * @enum {string}
+                             */
+                            position: "top" | "bottom";
+                            title?: string;
+                            body?: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            type: "image";
+                            /**
+                             * @description Where the block sits on the storefront home page: above (top) or below (bottom) the product list.
+                             * @enum {string}
+                             */
+                            position: "top" | "bottom";
+                            title?: string;
+                            image_url: string;
+                            alt?: string;
+                            link_url?: string;
+                        })[];
                         theme: string;
                         appearance: string;
                         payment_methods: {
@@ -19605,9 +20214,16 @@ export interface operations {
                     "application/json": {
                         /** @enum {string} */
                         object: "checkout";
+                        /** @description The order id for a one-time checkout. For a subscription checkout, the checkout session id; the subscription itself arrives with the subscription.created webhook once the first payment succeeds. */
                         id: string;
+                        /**
+                         * @description payment charges once. subscription charges the first period now and renews every billing interval.
+                         * @enum {string}
+                         */
+                        mode: "payment" | "subscription";
                         client_secret: string;
                         status: string;
+                        /** @description What the buyer pays now, VAT included. For a subscription, the first period. */
                         total: {
                             amount: number;
                             currency: string;
