@@ -2525,6 +2525,102 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/stores/{storeId}/discord": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getStoreDiscordIntegration"];
+        put?: never;
+        post?: never;
+        delete: operations["disconnectStoreDiscord"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/stores/{storeId}/discord/connect-url": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["createStoreDiscordConnectUrl"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/stores/{storeId}/discord/callback": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["completeStoreDiscordConnect"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/stores/{storeId}/discord/roles": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["listStoreDiscordRoles"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/storefront/{slug}/discord/authorize": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["authorizeStorefrontDiscord"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/discord/oauth/callback": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["discordOAuthCallback"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/stores/{storeId}/coupons": {
         parameters: {
             query?: never;
@@ -3985,6 +4081,8 @@ export interface operations {
                     country?: string;
                     /** @description Pass true once your checkout has asked the buyer to agree to immediate delivery and to losing the 14-day right of withdrawal. iPago records the time on the order, or on the subscription for a subscription checkout. */
                     withdrawal_waiver?: boolean;
+                    /** @description The buyer's Discord user id, for products that grant Discord roles. Required when any item does; iPago grants the roles to this account once the order is paid. For a subscription it is kept for every renewal. Link the account yourself (OAuth2 scope identify) so the id is really the buyer's. */
+                    discord_user_id?: string;
                 };
             };
         };
@@ -4207,6 +4305,8 @@ export interface operations {
                             };
                             coupon_code: string | null;
                             delivery_target: string | null;
+                            /** @description The buyer's Discord account id, when the order grants Discord roles. */
+                            discord_user_id: string | null;
                             payment_method: string | null;
                             card_last4: string | null;
                             /** @description What the payment provider reported about the charge, stored when the order was paid. Null on orders paid before this was recorded. */
@@ -4348,6 +4448,8 @@ export interface operations {
                         };
                         coupon_code: string | null;
                         delivery_target: string | null;
+                        /** @description The buyer's Discord account id, when the order grants Discord roles. */
+                        discord_user_id: string | null;
                         payment_method: string | null;
                         card_last4: string | null;
                         /** @description What the payment provider reported about the charge, stored when the order was paid. Null on orders paid before this was recorded. */
@@ -7726,6 +7828,8 @@ export interface operations {
                             };
                             coupon_code: string | null;
                             delivery_target: string | null;
+                            /** @description The buyer's Discord account id, when the order grants Discord roles. */
+                            discord_user_id: string | null;
                             payment_method: string | null;
                             card_last4: string | null;
                             /** @description What the payment provider reported about the charge, stored when the order was paid. Null on orders paid before this was recorded. */
@@ -7887,6 +7991,8 @@ export interface operations {
                         };
                         coupon_code: string | null;
                         delivery_target: string | null;
+                        /** @description The buyer's Discord account id, when the order grants Discord roles. */
+                        discord_user_id: string | null;
                         payment_method: string | null;
                         card_last4: string | null;
                         /** @description What the payment provider reported about the charge, stored when the order was paid. Null on orders paid before this was recorded. */
@@ -7930,6 +8036,26 @@ export interface operations {
                             risk_score: number | null;
                             three_d_secure: string | null;
                             receipt_url: string | null;
+                        } | null;
+                        discord?: {
+                            user_id: string | null;
+                            username: string | null;
+                            actions: {
+                                /** @enum {string} */
+                                object: "discord_role_action";
+                                id: string;
+                                /** @enum {string} */
+                                kind: "grant" | "revoke";
+                                role_id: string;
+                                guild_id: string | null;
+                                /** @description A grant: pending, done, failed, canceled (access ended before it ran) or revoked (access ended after). A removal: pending, done, failed or skipped (another purchase still entitles the buyer). */
+                                status: string;
+                                attempts: number;
+                                /** @description Why it failed, or why a removal was skipped. */
+                                reason: string | null;
+                                created: string;
+                                completed_at: string | null;
+                            }[];
                         } | null;
                     };
                 };
@@ -12106,6 +12232,8 @@ export interface operations {
                             };
                             coupon_code: string | null;
                             delivery_target: string | null;
+                            /** @description The buyer's Discord account id, when the order grants Discord roles. */
+                            discord_user_id: string | null;
                             payment_method: string | null;
                             card_last4: string | null;
                             /** @description What the payment provider reported about the charge, stored when the order was paid. Null on orders paid before this was recorded. */
@@ -18964,6 +19092,8 @@ export interface operations {
                                 currency: string;
                             } | null;
                             on_sale: boolean;
+                            /** @description Buying it grants Discord roles, so the buyer must link their Discord account first. */
+                            requires_discord: boolean;
                         }[];
                         has_more: boolean;
                     };
@@ -19048,6 +19178,8 @@ export interface operations {
                             currency: string;
                         } | null;
                         on_sale: boolean;
+                        /** @description Buying it grants Discord roles, so the buyer must link their Discord account first. */
+                        requires_discord: boolean;
                     };
                 };
             };
@@ -19374,6 +19506,8 @@ export interface operations {
                             };
                             code_last4: string;
                         } | null;
+                        /** @description Something in the basket grants Discord roles: checkout needs discord_link. */
+                        requires_discord: boolean;
                         expires_at: string;
                         token: string;
                     };
@@ -19474,6 +19608,8 @@ export interface operations {
                             };
                             code_last4: string;
                         } | null;
+                        /** @description Something in the basket grants Discord roles: checkout needs discord_link. */
+                        requires_discord: boolean;
                         expires_at: string;
                     };
                 };
@@ -19580,6 +19716,8 @@ export interface operations {
                             };
                             code_last4: string;
                         } | null;
+                        /** @description Something in the basket grants Discord roles: checkout needs discord_link. */
+                        requires_discord: boolean;
                         expires_at: string;
                     };
                 };
@@ -19697,6 +19835,8 @@ export interface operations {
                             };
                             code_last4: string;
                         } | null;
+                        /** @description Something in the basket grants Discord roles: checkout needs discord_link. */
+                        requires_discord: boolean;
                         expires_at: string;
                     };
                 };
@@ -19802,6 +19942,8 @@ export interface operations {
                             };
                             code_last4: string;
                         } | null;
+                        /** @description Something in the basket grants Discord roles: checkout needs discord_link. */
+                        requires_discord: boolean;
                         expires_at: string;
                     };
                 };
@@ -19918,6 +20060,8 @@ export interface operations {
                             };
                             code_last4: string;
                         } | null;
+                        /** @description Something in the basket grants Discord roles: checkout needs discord_link. */
+                        requires_discord: boolean;
                         expires_at: string;
                     };
                 };
@@ -20023,6 +20167,8 @@ export interface operations {
                             };
                             code_last4: string;
                         } | null;
+                        /** @description Something in the basket grants Discord roles: checkout needs discord_link. */
+                        requires_discord: boolean;
                         expires_at: string;
                     };
                 };
@@ -20139,6 +20285,8 @@ export interface operations {
                             };
                             code_last4: string;
                         } | null;
+                        /** @description Something in the basket grants Discord roles: checkout needs discord_link. */
+                        requires_discord: boolean;
                         expires_at: string;
                     };
                 };
@@ -20201,6 +20349,8 @@ export interface operations {
                     country?: string;
                     /** @description True once the buyer has ticked that they want delivery to start right away and that they lose the 14-day right of withdrawal once it has. Required on storefront checkouts. */
                     withdrawal_waiver?: boolean;
+                    /** @description The signed link token iPago handed back after the buyer linked their Discord account (POST /v1/storefront/{slug}/discord/authorize). Required when the purchase grants Discord roles. */
+                    discord_link?: string;
                 };
             };
         };
@@ -20340,6 +20490,8 @@ export interface operations {
                     country?: string;
                     /** @description True once the buyer has ticked that they want delivery to start right away and that they lose the 14-day right of withdrawal once it has. Required on storefront checkouts. */
                     withdrawal_waiver?: boolean;
+                    /** @description The signed link token iPago handed back after the buyer linked their Discord account (POST /v1/storefront/{slug}/discord/authorize). Required when the purchase grants Discord roles. */
+                    discord_link?: string;
                 };
             };
         };
@@ -20412,6 +20564,726 @@ export interface operations {
             };
             /** @description Default Response */
             503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    getStoreDiscordIntegration: {
+        parameters: {
+            query?: {
+                mode?: "live" | "test";
+            };
+            header?: never;
+            path: {
+                storeId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @enum {string} */
+                        object: "discord_integration";
+                        /** @description Whether Discord is set up on this iPago server at all. When false, nothing can be connected. */
+                        configured: boolean;
+                        /** @description The Discord server this store and mode delivers roles into, or null when none is connected. */
+                        guild: {
+                            id: string;
+                            name: string;
+                            connected_at: string;
+                            connected_by: string;
+                        } | null;
+                    };
+                };
+            };
+            /** @description Default Response */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+            /** @description Default Response */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+            /** @description Default Response */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    disconnectStoreDiscord: {
+        parameters: {
+            query?: {
+                mode?: "live" | "test";
+            };
+            header?: never;
+            path: {
+                storeId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @enum {string} */
+                        object: "discord_integration";
+                        /** @description Whether Discord is set up on this iPago server at all. When false, nothing can be connected. */
+                        configured: boolean;
+                        /** @description The Discord server this store and mode delivers roles into, or null when none is connected. */
+                        guild: {
+                            id: string;
+                            name: string;
+                            connected_at: string;
+                            connected_by: string;
+                        } | null;
+                    };
+                };
+            };
+            /** @description Default Response */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+            /** @description Default Response */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+            /** @description Default Response */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    createStoreDiscordConnectUrl: {
+        parameters: {
+            query?: {
+                mode?: "live" | "test";
+            };
+            header?: never;
+            path: {
+                storeId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @enum {string} */
+                        object: "discord_connect_url";
+                        /** @description Send the merchant here to invite iPago's bot into their Discord server. */
+                        url: string;
+                        expires_at: string;
+                    };
+                };
+            };
+            /** @description Default Response */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+            /** @description Default Response */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+            /** @description Default Response */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+            /** @description Default Response */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+            /** @description Default Response */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    completeStoreDiscordConnect: {
+        parameters: {
+            query?: {
+                mode?: "live" | "test";
+            };
+            header?: never;
+            path: {
+                storeId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @description The code Discord put on the redirect. */
+                    code: string;
+                    /** @description The state Discord put on the redirect, unchanged. */
+                    state: string;
+                    /** @description Ignored: the server is read from Discord's token response, which cannot be edited in the URL. */
+                    guild_id?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @enum {string} */
+                        object: "discord_integration";
+                        /** @description Whether Discord is set up on this iPago server at all. When false, nothing can be connected. */
+                        configured: boolean;
+                        /** @description The Discord server this store and mode delivers roles into, or null when none is connected. */
+                        guild: {
+                            id: string;
+                            name: string;
+                            connected_at: string;
+                            connected_by: string;
+                        } | null;
+                    };
+                };
+            };
+            /** @description Default Response */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+            /** @description Default Response */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+            /** @description Default Response */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+            /** @description Default Response */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+            /** @description Default Response */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+            /** @description Default Response */
+            502: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+            /** @description Default Response */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    listStoreDiscordRoles: {
+        parameters: {
+            query?: {
+                mode?: "live" | "test";
+            };
+            header?: never;
+            path: {
+                storeId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @enum {string} */
+                        object: "discord_roles";
+                        guild: {
+                            id: string;
+                            name: string;
+                        };
+                        /** @description Whether iPago's bot holds Manage Roles in the server. Without it no role is grantable. */
+                        can_manage_roles: boolean;
+                        data: {
+                            id: string;
+                            name: string;
+                            color: number;
+                            position: number;
+                            managed: boolean;
+                            /** @description False for @everyone, roles an integration manages, and roles at or above the bot's own highest role. */
+                            grantable: boolean;
+                        }[];
+                    };
+                };
+            };
+            /** @description Default Response */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+            /** @description Default Response */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+            /** @description Default Response */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+            /** @description Default Response */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+            /** @description Default Response */
+            502: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+            /** @description Default Response */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    authorizeStorefrontDiscord: {
+        parameters: {
+            query?: {
+                preview?: string;
+                mode?: "live" | "test";
+            };
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @description Where Discord's answer lands: a page of this storefront. It gets discord_link=<token> on success, or discord_error=<code>. */
+                    return_url: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Default Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @enum {string} */
+                        object: "discord_authorization";
+                        /** @description Send the buyer here. Discord returns them to return_url with discord_link (or discord_error) in the query. */
+                        url: string;
+                    };
+                };
+            };
+            /** @description Default Response */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+            /** @description Default Response */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+            /** @description Default Response */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            type: string;
+                            code: string;
+                            message: string;
+                            param?: string;
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    discordOAuthCallback: {
+        parameters: {
+            query?: {
+                code?: string;
+                state?: string;
+                error?: string;
+                error_description?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Default Response */
+            400: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -21571,6 +22443,7 @@ export interface operations {
                             billing_interval: "month" | "year";
                             customer_email: string | null;
                             delivery_target: string | null;
+                            discord_user_id: string | null;
                             /** @enum {string} */
                             status: "active" | "past_due" | "canceled";
                             current_period_end: string | null;
@@ -21650,6 +22523,7 @@ export interface operations {
                         billing_interval: "month" | "year";
                         customer_email: string | null;
                         delivery_target: string | null;
+                        discord_user_id: string | null;
                         /** @enum {string} */
                         status: "active" | "past_due" | "canceled";
                         current_period_end: string | null;
@@ -21766,6 +22640,7 @@ export interface operations {
                             billing_interval: "month" | "year";
                             customer_email: string | null;
                             delivery_target: string | null;
+                            discord_user_id: string | null;
                             /** @enum {string} */
                             status: "active" | "past_due" | "canceled";
                             current_period_end: string | null;
@@ -21836,6 +22711,7 @@ export interface operations {
                         billing_interval: "month" | "year";
                         customer_email: string | null;
                         delivery_target: string | null;
+                        discord_user_id: string | null;
                         /** @enum {string} */
                         status: "active" | "past_due" | "canceled";
                         current_period_end: string | null;
@@ -22972,6 +23848,8 @@ export interface operations {
                         };
                         coupon_code: string | null;
                         delivery_target: string | null;
+                        /** @description The buyer's Discord account id, when the order grants Discord roles. */
+                        discord_user_id: string | null;
                         payment_method: string | null;
                         card_last4: string | null;
                         /** @description What the payment provider reported about the charge, stored when the order was paid. Null on orders paid before this was recorded. */

@@ -2517,6 +2517,11 @@
                   "withdrawal_waiver": {
                     "description": "Pass true once your checkout has asked the buyer to agree to immediate delivery and to losing the 14-day right of withdrawal. iPago records the time on the order, or on the subscription for a subscription checkout.",
                     "type": "boolean"
+                  },
+                  "discord_user_id": {
+                    "description": "The buyer's Discord user id, for products that grant Discord roles. Required when any item does; iPago grants the roles to this account once the order is paid. For a subscription it is kept for every renewal. Link the account yourself (OAuth2 scope identify) so the id is really the buyer's.",
+                    "type": "string",
+                    "pattern": "^\\d{17,20}$"
                   }
                 },
                 "required": [
@@ -3188,6 +3193,11 @@
                             "nullable": true,
                             "type": "string"
                           },
+                          "discord_user_id": {
+                            "nullable": true,
+                            "description": "The buyer's Discord account id, when the order grants Discord roles.",
+                            "type": "string"
+                          },
                           "payment_method": {
                             "nullable": true,
                             "type": "string"
@@ -3279,6 +3289,7 @@
                           "total",
                           "coupon_code",
                           "delivery_target",
+                          "discord_user_id",
                           "payment_method",
                           "card_last4",
                           "payment_evidence",
@@ -3692,6 +3703,11 @@
                       "nullable": true,
                       "type": "string"
                     },
+                    "discord_user_id": {
+                      "nullable": true,
+                      "description": "The buyer's Discord account id, when the order grants Discord roles.",
+                      "type": "string"
+                    },
                     "payment_method": {
                       "nullable": true,
                       "type": "string"
@@ -3783,6 +3799,7 @@
                     "total",
                     "coupon_code",
                     "delivery_target",
+                    "discord_user_id",
                     "payment_method",
                     "card_last4",
                     "payment_evidence",
@@ -12116,6 +12133,11 @@
                             "nullable": true,
                             "type": "string"
                           },
+                          "discord_user_id": {
+                            "nullable": true,
+                            "description": "The buyer's Discord account id, when the order grants Discord roles.",
+                            "type": "string"
+                          },
                           "payment_method": {
                             "nullable": true,
                             "type": "string"
@@ -12207,6 +12229,7 @@
                           "total",
                           "coupon_code",
                           "delivery_target",
+                          "discord_user_id",
                           "payment_method",
                           "card_last4",
                           "payment_evidence",
@@ -12684,6 +12707,11 @@
                       "nullable": true,
                       "type": "string"
                     },
+                    "discord_user_id": {
+                      "nullable": true,
+                      "description": "The buyer's Discord account id, when the order grants Discord roles.",
+                      "type": "string"
+                    },
                     "payment_method": {
                       "nullable": true,
                       "type": "string"
@@ -12886,6 +12914,91 @@
                         "receipt_url"
                       ],
                       "additionalProperties": false
+                    },
+                    "discord": {
+                      "nullable": true,
+                      "type": "object",
+                      "properties": {
+                        "user_id": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "username": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "actions": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "object": {
+                                "type": "string",
+                                "enum": [
+                                  "discord_role_action"
+                                ]
+                              },
+                              "id": {
+                                "type": "string"
+                              },
+                              "kind": {
+                                "type": "string",
+                                "enum": [
+                                  "grant",
+                                  "revoke"
+                                ]
+                              },
+                              "role_id": {
+                                "type": "string"
+                              },
+                              "guild_id": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "status": {
+                                "type": "string",
+                                "description": "A grant: pending, done, failed, canceled (access ended before it ran) or revoked (access ended after). A removal: pending, done, failed or skipped (another purchase still entitles the buyer)."
+                              },
+                              "attempts": {
+                                "type": "integer",
+                                "minimum": -9007199254740991,
+                                "maximum": 9007199254740991
+                              },
+                              "reason": {
+                                "nullable": true,
+                                "description": "Why it failed, or why a removal was skipped.",
+                                "type": "string"
+                              },
+                              "created": {
+                                "type": "string"
+                              },
+                              "completed_at": {
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "object",
+                              "id",
+                              "kind",
+                              "role_id",
+                              "guild_id",
+                              "status",
+                              "attempts",
+                              "reason",
+                              "created",
+                              "completed_at"
+                            ],
+                            "additionalProperties": false
+                          }
+                        }
+                      },
+                      "required": [
+                        "user_id",
+                        "username",
+                        "actions"
+                      ],
+                      "additionalProperties": false
                     }
                   },
                   "required": [
@@ -12903,6 +13016,7 @@
                     "total",
                     "coupon_code",
                     "delivery_target",
+                    "discord_user_id",
                     "payment_method",
                     "card_last4",
                     "payment_evidence",
@@ -25063,6 +25177,11 @@
                             "nullable": true,
                             "type": "string"
                           },
+                          "discord_user_id": {
+                            "nullable": true,
+                            "description": "The buyer's Discord account id, when the order grants Discord roles.",
+                            "type": "string"
+                          },
                           "payment_method": {
                             "nullable": true,
                             "type": "string"
@@ -25173,6 +25292,7 @@
                           "total",
                           "coupon_code",
                           "delivery_target",
+                          "discord_user_id",
                           "payment_method",
                           "card_last4",
                           "payment_evidence",
@@ -43483,6 +43603,10 @@
                           },
                           "on_sale": {
                             "type": "boolean"
+                          },
+                          "requires_discord": {
+                            "type": "boolean",
+                            "description": "Buying it grants Discord roles, so the buyer must link their Discord account first."
                           }
                         },
                         "required": [
@@ -43499,7 +43623,8 @@
                           "created",
                           "updated",
                           "original_price",
-                          "on_sale"
+                          "on_sale",
+                          "requires_discord"
                         ],
                         "additionalProperties": false
                       }
@@ -43734,6 +43859,10 @@
                     },
                     "on_sale": {
                       "type": "boolean"
+                    },
+                    "requires_discord": {
+                      "type": "boolean",
+                      "description": "Buying it grants Discord roles, so the buyer must link their Discord account first."
                     }
                   },
                   "required": [
@@ -43750,7 +43879,8 @@
                     "created",
                     "updated",
                     "original_price",
-                    "on_sale"
+                    "on_sale",
+                    "requires_discord"
                   ],
                   "additionalProperties": false
                 }
@@ -44662,6 +44792,10 @@
                       ],
                       "additionalProperties": false
                     },
+                    "requires_discord": {
+                      "type": "boolean",
+                      "description": "Something in the basket grants Discord roles: checkout needs discord_link."
+                    },
                     "expires_at": {
                       "type": "string"
                     },
@@ -44680,6 +44814,7 @@
                     "total",
                     "coupon",
                     "gift_card",
+                    "requires_discord",
                     "expires_at",
                     "token"
                   ],
@@ -44988,6 +45123,10 @@
                       ],
                       "additionalProperties": false
                     },
+                    "requires_discord": {
+                      "type": "boolean",
+                      "description": "Something in the basket grants Discord roles: checkout needs discord_link."
+                    },
                     "expires_at": {
                       "type": "string"
                     }
@@ -45003,6 +45142,7 @@
                     "total",
                     "coupon",
                     "gift_card",
+                    "requires_discord",
                     "expires_at"
                   ],
                   "additionalProperties": false
@@ -45333,6 +45473,10 @@
                       ],
                       "additionalProperties": false
                     },
+                    "requires_discord": {
+                      "type": "boolean",
+                      "description": "Something in the basket grants Discord roles: checkout needs discord_link."
+                    },
                     "expires_at": {
                       "type": "string"
                     }
@@ -45348,6 +45492,7 @@
                     "total",
                     "coupon",
                     "gift_card",
+                    "requires_discord",
                     "expires_at"
                   ],
                   "additionalProperties": false
@@ -45706,6 +45851,10 @@
                       ],
                       "additionalProperties": false
                     },
+                    "requires_discord": {
+                      "type": "boolean",
+                      "description": "Something in the basket grants Discord roles: checkout needs discord_link."
+                    },
                     "expires_at": {
                       "type": "string"
                     }
@@ -45721,6 +45870,7 @@
                     "total",
                     "coupon",
                     "gift_card",
+                    "requires_discord",
                     "expires_at"
                   ],
                   "additionalProperties": false
@@ -46048,6 +46198,10 @@
                       ],
                       "additionalProperties": false
                     },
+                    "requires_discord": {
+                      "type": "boolean",
+                      "description": "Something in the basket grants Discord roles: checkout needs discord_link."
+                    },
                     "expires_at": {
                       "type": "string"
                     }
@@ -46063,6 +46217,7 @@
                     "total",
                     "coupon",
                     "gift_card",
+                    "requires_discord",
                     "expires_at"
                   ],
                   "additionalProperties": false
@@ -46411,6 +46566,10 @@
                       ],
                       "additionalProperties": false
                     },
+                    "requires_discord": {
+                      "type": "boolean",
+                      "description": "Something in the basket grants Discord roles: checkout needs discord_link."
+                    },
                     "expires_at": {
                       "type": "string"
                     }
@@ -46426,6 +46585,7 @@
                     "total",
                     "coupon",
                     "gift_card",
+                    "requires_discord",
                     "expires_at"
                   ],
                   "additionalProperties": false
@@ -46753,6 +46913,10 @@
                       ],
                       "additionalProperties": false
                     },
+                    "requires_discord": {
+                      "type": "boolean",
+                      "description": "Something in the basket grants Discord roles: checkout needs discord_link."
+                    },
                     "expires_at": {
                       "type": "string"
                     }
@@ -46768,6 +46932,7 @@
                     "total",
                     "coupon",
                     "gift_card",
+                    "requires_discord",
                     "expires_at"
                   ],
                   "additionalProperties": false
@@ -47116,6 +47281,10 @@
                       ],
                       "additionalProperties": false
                     },
+                    "requires_discord": {
+                      "type": "boolean",
+                      "description": "Something in the basket grants Discord roles: checkout needs discord_link."
+                    },
                     "expires_at": {
                       "type": "string"
                     }
@@ -47131,6 +47300,7 @@
                     "total",
                     "coupon",
                     "gift_card",
+                    "requires_discord",
                     "expires_at"
                   ],
                   "additionalProperties": false
@@ -47252,6 +47422,11 @@
                   "withdrawal_waiver": {
                     "description": "True once the buyer has ticked that they want delivery to start right away and that they lose the 14-day right of withdrawal once it has. Required on storefront checkouts.",
                     "type": "boolean"
+                  },
+                  "discord_link": {
+                    "description": "The signed link token iPago handed back after the buyer linked their Discord account (POST /v1/storefront/{slug}/discord/authorize). Required when the purchase grants Discord roles.",
+                    "type": "string",
+                    "maxLength": 2048
                   }
                 }
               }
@@ -47610,6 +47785,11 @@
                   "withdrawal_waiver": {
                     "description": "True once the buyer has ticked that they want delivery to start right away and that they lose the 14-day right of withdrawal once it has. Required on storefront checkouts.",
                     "type": "boolean"
+                  },
+                  "discord_link": {
+                    "description": "The signed link token iPago handed back after the buyer linked their Discord account (POST /v1/storefront/{slug}/discord/authorize). Required when the purchase grants Discord roles.",
+                    "type": "string",
+                    "maxLength": 2048
                   }
                 },
                 "required": [
@@ -47814,6 +47994,1798 @@
             }
           },
           "503": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string"
+                        },
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "param": {
+                          "type": "string"
+                        },
+                        "request_id": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "type",
+                        "code",
+                        "message",
+                        "request_id"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/stores/{storeId}/discord": {
+      "get": {
+        "operationId": "getStoreDiscordIntegration",
+        "parameters": [
+          {
+            "schema": {
+              "default": "live",
+              "type": "string",
+              "enum": [
+                "live",
+                "test"
+              ]
+            },
+            "in": "query",
+            "name": "mode",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "storeId",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "object": {
+                      "type": "string",
+                      "enum": [
+                        "discord_integration"
+                      ]
+                    },
+                    "configured": {
+                      "type": "boolean",
+                      "description": "Whether Discord is set up on this iPago server at all. When false, nothing can be connected."
+                    },
+                    "guild": {
+                      "nullable": true,
+                      "description": "The Discord server this store and mode delivers roles into, or null when none is connected.",
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "connected_at": {
+                          "type": "string"
+                        },
+                        "connected_by": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "name",
+                        "connected_at",
+                        "connected_by"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "object",
+                    "configured",
+                    "guild"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string"
+                        },
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "param": {
+                          "type": "string"
+                        },
+                        "request_id": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "type",
+                        "code",
+                        "message",
+                        "request_id"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string"
+                        },
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "param": {
+                          "type": "string"
+                        },
+                        "request_id": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "type",
+                        "code",
+                        "message",
+                        "request_id"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string"
+                        },
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "param": {
+                          "type": "string"
+                        },
+                        "request_id": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "type",
+                        "code",
+                        "message",
+                        "request_id"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "disconnectStoreDiscord",
+        "parameters": [
+          {
+            "schema": {
+              "default": "live",
+              "type": "string",
+              "enum": [
+                "live",
+                "test"
+              ]
+            },
+            "in": "query",
+            "name": "mode",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "storeId",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "object": {
+                      "type": "string",
+                      "enum": [
+                        "discord_integration"
+                      ]
+                    },
+                    "configured": {
+                      "type": "boolean",
+                      "description": "Whether Discord is set up on this iPago server at all. When false, nothing can be connected."
+                    },
+                    "guild": {
+                      "nullable": true,
+                      "description": "The Discord server this store and mode delivers roles into, or null when none is connected.",
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "connected_at": {
+                          "type": "string"
+                        },
+                        "connected_by": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "name",
+                        "connected_at",
+                        "connected_by"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "object",
+                    "configured",
+                    "guild"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string"
+                        },
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "param": {
+                          "type": "string"
+                        },
+                        "request_id": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "type",
+                        "code",
+                        "message",
+                        "request_id"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string"
+                        },
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "param": {
+                          "type": "string"
+                        },
+                        "request_id": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "type",
+                        "code",
+                        "message",
+                        "request_id"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string"
+                        },
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "param": {
+                          "type": "string"
+                        },
+                        "request_id": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "type",
+                        "code",
+                        "message",
+                        "request_id"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/stores/{storeId}/discord/connect-url": {
+      "post": {
+        "operationId": "createStoreDiscordConnectUrl",
+        "parameters": [
+          {
+            "schema": {
+              "default": "live",
+              "type": "string",
+              "enum": [
+                "live",
+                "test"
+              ]
+            },
+            "in": "query",
+            "name": "mode",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "storeId",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "object": {
+                      "type": "string",
+                      "enum": [
+                        "discord_connect_url"
+                      ]
+                    },
+                    "url": {
+                      "type": "string",
+                      "description": "Send the merchant here to invite iPago's bot into their Discord server."
+                    },
+                    "expires_at": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "object",
+                    "url",
+                    "expires_at"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string"
+                        },
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "param": {
+                          "type": "string"
+                        },
+                        "request_id": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "type",
+                        "code",
+                        "message",
+                        "request_id"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string"
+                        },
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "param": {
+                          "type": "string"
+                        },
+                        "request_id": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "type",
+                        "code",
+                        "message",
+                        "request_id"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string"
+                        },
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "param": {
+                          "type": "string"
+                        },
+                        "request_id": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "type",
+                        "code",
+                        "message",
+                        "request_id"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string"
+                        },
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "param": {
+                          "type": "string"
+                        },
+                        "request_id": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "type",
+                        "code",
+                        "message",
+                        "request_id"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string"
+                        },
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "param": {
+                          "type": "string"
+                        },
+                        "request_id": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "type",
+                        "code",
+                        "message",
+                        "request_id"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/stores/{storeId}/discord/callback": {
+      "post": {
+        "operationId": "completeStoreDiscordConnect",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "code": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 512,
+                    "description": "The code Discord put on the redirect."
+                  },
+                  "state": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 2048,
+                    "description": "The state Discord put on the redirect, unchanged."
+                  },
+                  "guild_id": {
+                    "description": "Ignored: the server is read from Discord's token response, which cannot be edited in the URL.",
+                    "type": "string",
+                    "maxLength": 32
+                  }
+                },
+                "required": [
+                  "code",
+                  "state"
+                ]
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "default": "live",
+              "type": "string",
+              "enum": [
+                "live",
+                "test"
+              ]
+            },
+            "in": "query",
+            "name": "mode",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "storeId",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "object": {
+                      "type": "string",
+                      "enum": [
+                        "discord_integration"
+                      ]
+                    },
+                    "configured": {
+                      "type": "boolean",
+                      "description": "Whether Discord is set up on this iPago server at all. When false, nothing can be connected."
+                    },
+                    "guild": {
+                      "nullable": true,
+                      "description": "The Discord server this store and mode delivers roles into, or null when none is connected.",
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "connected_at": {
+                          "type": "string"
+                        },
+                        "connected_by": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "name",
+                        "connected_at",
+                        "connected_by"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "object",
+                    "configured",
+                    "guild"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string"
+                        },
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "param": {
+                          "type": "string"
+                        },
+                        "request_id": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "type",
+                        "code",
+                        "message",
+                        "request_id"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string"
+                        },
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "param": {
+                          "type": "string"
+                        },
+                        "request_id": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "type",
+                        "code",
+                        "message",
+                        "request_id"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string"
+                        },
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "param": {
+                          "type": "string"
+                        },
+                        "request_id": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "type",
+                        "code",
+                        "message",
+                        "request_id"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string"
+                        },
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "param": {
+                          "type": "string"
+                        },
+                        "request_id": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "type",
+                        "code",
+                        "message",
+                        "request_id"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string"
+                        },
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "param": {
+                          "type": "string"
+                        },
+                        "request_id": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "type",
+                        "code",
+                        "message",
+                        "request_id"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string"
+                        },
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "param": {
+                          "type": "string"
+                        },
+                        "request_id": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "type",
+                        "code",
+                        "message",
+                        "request_id"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string"
+                        },
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "param": {
+                          "type": "string"
+                        },
+                        "request_id": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "type",
+                        "code",
+                        "message",
+                        "request_id"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/stores/{storeId}/discord/roles": {
+      "get": {
+        "operationId": "listStoreDiscordRoles",
+        "parameters": [
+          {
+            "schema": {
+              "default": "live",
+              "type": "string",
+              "enum": [
+                "live",
+                "test"
+              ]
+            },
+            "in": "query",
+            "name": "mode",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "storeId",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "object": {
+                      "type": "string",
+                      "enum": [
+                        "discord_roles"
+                      ]
+                    },
+                    "guild": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "name"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "can_manage_roles": {
+                      "type": "boolean",
+                      "description": "Whether iPago's bot holds Manage Roles in the server. Without it no role is grantable."
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "color": {
+                            "type": "integer",
+                            "minimum": -9007199254740991,
+                            "maximum": 9007199254740991
+                          },
+                          "position": {
+                            "type": "integer",
+                            "minimum": -9007199254740991,
+                            "maximum": 9007199254740991
+                          },
+                          "managed": {
+                            "type": "boolean"
+                          },
+                          "grantable": {
+                            "type": "boolean",
+                            "description": "False for @everyone, roles an integration manages, and roles at or above the bot's own highest role."
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "name",
+                          "color",
+                          "position",
+                          "managed",
+                          "grantable"
+                        ],
+                        "additionalProperties": false
+                      }
+                    }
+                  },
+                  "required": [
+                    "object",
+                    "guild",
+                    "can_manage_roles",
+                    "data"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string"
+                        },
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "param": {
+                          "type": "string"
+                        },
+                        "request_id": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "type",
+                        "code",
+                        "message",
+                        "request_id"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string"
+                        },
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "param": {
+                          "type": "string"
+                        },
+                        "request_id": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "type",
+                        "code",
+                        "message",
+                        "request_id"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string"
+                        },
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "param": {
+                          "type": "string"
+                        },
+                        "request_id": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "type",
+                        "code",
+                        "message",
+                        "request_id"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string"
+                        },
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "param": {
+                          "type": "string"
+                        },
+                        "request_id": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "type",
+                        "code",
+                        "message",
+                        "request_id"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string"
+                        },
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "param": {
+                          "type": "string"
+                        },
+                        "request_id": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "type",
+                        "code",
+                        "message",
+                        "request_id"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string"
+                        },
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "param": {
+                          "type": "string"
+                        },
+                        "request_id": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "type",
+                        "code",
+                        "message",
+                        "request_id"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/storefront/{slug}/discord/authorize": {
+      "post": {
+        "operationId": "authorizeStorefrontDiscord",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "return_url": {
+                    "type": "string",
+                    "maxLength": 2048,
+                    "description": "Where Discord's answer lands: a page of this storefront. It gets discord_link=<token> on success, or discord_error=<code>."
+                  }
+                },
+                "required": [
+                  "return_url"
+                ]
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "preview",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "live",
+                "test"
+              ]
+            },
+            "in": "query",
+            "name": "mode",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "slug",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "object": {
+                      "type": "string",
+                      "enum": [
+                        "discord_authorization"
+                      ]
+                    },
+                    "url": {
+                      "type": "string",
+                      "description": "Send the buyer here. Discord returns them to return_url with discord_link (or discord_error) in the query."
+                    }
+                  },
+                  "required": [
+                    "object",
+                    "url"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string"
+                        },
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "param": {
+                          "type": "string"
+                        },
+                        "request_id": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "type",
+                        "code",
+                        "message",
+                        "request_id"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string"
+                        },
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "param": {
+                          "type": "string"
+                        },
+                        "request_id": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "type",
+                        "code",
+                        "message",
+                        "request_id"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string"
+                        },
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "param": {
+                          "type": "string"
+                        },
+                        "request_id": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "type",
+                        "code",
+                        "message",
+                        "request_id"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/discord/oauth/callback": {
+      "get": {
+        "operationId": "discordOAuthCallback",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "maxLength": 512
+            },
+            "in": "query",
+            "name": "code",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string",
+              "maxLength": 4096
+            },
+            "in": "query",
+            "name": "state",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string",
+              "maxLength": 200
+            },
+            "in": "query",
+            "name": "error",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string",
+              "maxLength": 1000
+            },
+            "in": "query",
+            "name": "error_description",
+            "required": false
+          }
+        ],
+        "responses": {
+          "400": {
             "description": "Default Response",
             "content": {
               "application/json": {
@@ -50987,6 +52959,10 @@
                             "nullable": true,
                             "type": "string"
                           },
+                          "discord_user_id": {
+                            "nullable": true,
+                            "type": "string"
+                          },
                           "status": {
                             "type": "string",
                             "enum": [
@@ -51018,6 +52994,7 @@
                           "billing_interval",
                           "customer_email",
                           "delivery_target",
+                          "discord_user_id",
                           "status",
                           "current_period_end",
                           "created",
@@ -51214,6 +53191,10 @@
                       "nullable": true,
                       "type": "string"
                     },
+                    "discord_user_id": {
+                      "nullable": true,
+                      "type": "string"
+                    },
                     "status": {
                       "type": "string",
                       "enum": [
@@ -51245,6 +53226,7 @@
                     "billing_interval",
                     "customer_email",
                     "delivery_target",
+                    "discord_user_id",
                     "status",
                     "current_period_end",
                     "created",
@@ -51544,6 +53526,10 @@
                             "nullable": true,
                             "type": "string"
                           },
+                          "discord_user_id": {
+                            "nullable": true,
+                            "type": "string"
+                          },
                           "status": {
                             "type": "string",
                             "enum": [
@@ -51575,6 +53561,7 @@
                           "billing_interval",
                           "customer_email",
                           "delivery_target",
+                          "discord_user_id",
                           "status",
                           "current_period_end",
                           "created",
@@ -51752,6 +53739,10 @@
                       "nullable": true,
                       "type": "string"
                     },
+                    "discord_user_id": {
+                      "nullable": true,
+                      "type": "string"
+                    },
                     "status": {
                       "type": "string",
                       "enum": [
@@ -51783,6 +53774,7 @@
                     "billing_interval",
                     "customer_email",
                     "delivery_target",
+                    "discord_user_id",
                     "status",
                     "current_period_end",
                     "created",
@@ -54748,6 +56740,11 @@
                       "nullable": true,
                       "type": "string"
                     },
+                    "discord_user_id": {
+                      "nullable": true,
+                      "description": "The buyer's Discord account id, when the order grants Discord roles.",
+                      "type": "string"
+                    },
                     "payment_method": {
                       "nullable": true,
                       "type": "string"
@@ -54960,6 +56957,7 @@
                     "total",
                     "coupon_code",
                     "delivery_target",
+                    "discord_user_id",
                     "payment_method",
                     "card_last4",
                     "payment_evidence",
